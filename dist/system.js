@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.System = void 0;
+const model_1 = require("./model");
+const utils_1 = require("./utils");
+const intersect_1 = require("./intersect");
+const optimized_1 = require("./optimized");
 const base_system_1 = require("./base-system");
 const line_1 = require("./bodies/line");
-const intersect_1 = require("./intersect");
-const model_1 = require("./model");
-const optimized_1 = require("./optimized");
-const utils_1 = require("./utils");
 /**
  * collision system
  */
@@ -207,7 +207,7 @@ class System extends base_system_1.BaseSystem {
         }
         // unique
         return collisionPoints.filter(({ x, y }, index) => index ===
-            collisionPoints.findIndex((collisionPoint) => collisionPoint.x === x && collisionPoint.y === y));
+            collisionPoints.findIndex((collisionPoint) => (0, utils_1.pointsEqual)(collisionPoint, { x, y })));
     }
 }
 exports.System = System;

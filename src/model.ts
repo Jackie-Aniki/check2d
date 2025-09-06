@@ -25,6 +25,21 @@ export {
   quickDecomp
 } from 'poly-decomp-es'
 
+export type PolygonLike = {
+  pos: Vector
+  calcPoints: Vector[]
+}
+
+export type CircleLike = {
+  pos: Vector
+  r: number
+}
+
+export type LineLike = {
+  start: Vector
+  end: Vector
+}
+
 export interface BBox {
   minX: number
   minY: number

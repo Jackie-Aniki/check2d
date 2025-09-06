@@ -4511,11 +4511,13 @@ exports.circleOutsidePolygon = circleOutsidePolygon;
 exports.intersectLineCircle = intersectLineCircle;
 exports.intersectLineLineFast = intersectLineLineFast;
 exports.intersectLineLine = intersectLineLine;
+exports.intersectPolygonPolygon = intersectPolygonPolygon;
 exports.intersectLinePolygon = intersectLinePolygon;
 exports.intersectCircleCircle = intersectCircleCircle;
-const sat_1 = __webpack_require__(/*! sat */ "./node_modules/sat/SAT.js");
 const model_1 = __webpack_require__(/*! ./model */ "./src/model.ts");
 const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
+const sat_1 = __webpack_require__(/*! sat */ "./node_modules/sat/SAT.js");
+const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 /**
  * replace body with array of related convex polygons
  */
@@ -4714,7 +4716,7 @@ function intersectLineLine(line1, line2) {
     const dX = line1.end.x - line1.start.x;
     const dY = line1.end.y - line1.start.y;
     const determinant = dX * (line2.end.y - line2.start.y) - (line2.end.x - line2.start.x) * dY;
-    if (determinant === 0) {
+    if (Math.abs(determinant) < Number.EPSILON) {
         return;
     }
     const lambda = ((line2.end.y - line2.start.y) * (line2.end.x - line1.start.x) +
@@ -4723,12 +4725,46 @@ function intersectLineLine(line1, line2) {
     const gamma = ((line1.start.y - line1.end.y) * (line2.end.x - line1.start.x) +
         dX * (line2.end.y - line1.start.y)) /
         determinant;
-    // check if there is an intersection
-    if (!(lambda >= 0 && lambda <= 1) || !(gamma >= 0 && gamma <= 1)) {
+    // stricter check – no eps fudge, only inside [0,1]
+    if (lambda < 0 || lambda > 1 || gamma < 0 || gamma > 1) {
         return;
     }
     return { x: line1.start.x + lambda * dX, y: line1.start.y + lambda * dY };
 }
+/**
+ * Computes all intersection points between two polygons.
+ *
+ * Iterates over each edge of `polygonA` and checks against `polygonB`
+ * using {@link intersectLinePolygon}.
+ * Removes duplicates.
+ * Also detects corner–corner touches.
+ *
+ * @param {PolygonLike} polygonA - First polygon
+ * @param {PolygonLike} polygonB - Second polygon
+ * @returns {Vector[]} Array of intersection points (empty if none found)
+ */
+function intersectPolygonPolygon(polygonA, polygonB) {
+    const pointsA = (0, utils_1.getWorldPoints)(polygonA);
+    const pointsB = (0, utils_1.getWorldPoints)(polygonB);
+    const results = [];
+    (0, optimized_1.forEach)(pointsA, (start, index) => {
+        const end = pointsA[(index + 1) % pointsA.length];
+        (0, optimized_1.forEach)(intersectLinePolygon({ start, end }, { pos: { x: 0, y: 0 }, calcPoints: pointsB }), ({ x, y }) => {
+            // add unique
+            if (!results.find((point) => x === point.x && y === point.y)) {
+                results.push({ x, y });
+            }
+        });
+    });
+    return results;
+}
+/**
+ * Computes all intersection points between a line segment and a polygon.
+ *
+ * @param {LineLike} line - The line segment
+ * @param {PolygonLike} polygon - A polygon object or array of global points
+ * @returns {Vector[]} Array of intersection points (empty if none)
+ */
 function intersectLinePolygon(line, polygon) {
     const results = [];
     (0, optimized_1.forEach)(polygon.calcPoints, (to, index) => {
@@ -4853,8 +4889,8 @@ exports.map = exports.filter = exports.every = exports.some = exports.forEach = 
  * basic benchmark: https://jsbench.me/urle772xdn
  */
 const forEach = (array, callback) => {
-    for (let i = 0, l = array.length; i < l; i++) {
-        callback(array[i], i);
+    for (let index = 0, len = array.length; index < len; index++) {
+        callback(array[index], index);
     }
 };
 exports.forEach = forEach;
@@ -4864,8 +4900,8 @@ exports.forEach = forEach;
  * basic benchmark: https://jsbench.me/l0le7bnnsq
  */
 const some = (array, callback) => {
-    for (let i = 0, l = array.length; i < l; i++) {
-        if (callback(array[i], i)) {
+    for (let index = 0, len = array.length; index < len; index++) {
+        if (callback(array[index], index)) {
             return true;
         }
     }
@@ -4878,8 +4914,8 @@ exports.some = some;
  * basic benchmark: https://jsbench.me/unle7da29v
  */
 const every = (array, callback) => {
-    for (let i = 0, l = array.length; i < l; i++) {
-        if (!callback(array[i], i)) {
+    for (let index = 0, len = array.length; index < len; index++) {
+        if (!callback(array[index], index)) {
             return false;
         }
     }
@@ -4893,9 +4929,9 @@ exports.every = every;
  */
 const filter = (array, callback) => {
     const output = [];
-    for (let i = 0, l = array.length; i < l; i++) {
-        const item = array[i];
-        if (callback(item, i)) {
+    for (let index = 0, len = array.length; index < len; index++) {
+        const item = array[index];
+        if (callback(item, index)) {
             output.push(item);
         }
     }
@@ -4908,10 +4944,10 @@ exports.filter = filter;
  * basic benchmark: https://jsbench.me/oyle77vbpc
  */
 const map = (array, callback) => {
-    const l = array.length;
-    const output = new Array(l);
-    for (let i = 0; i < l; i++) {
-        output[i] = callback(array[i], i);
+    const len = array.length;
+    const output = new Array(len);
+    for (let index = 0; index < len; index++) {
+        output[index] = callback(array[index], index);
     }
     return output;
 };
@@ -4930,12 +4966,12 @@ exports.map = map;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.System = void 0;
+const model_1 = __webpack_require__(/*! ./model */ "./src/model.ts");
+const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+const intersect_1 = __webpack_require__(/*! ./intersect */ "./src/intersect.ts");
+const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
 const base_system_1 = __webpack_require__(/*! ./base-system */ "./src/base-system.ts");
 const line_1 = __webpack_require__(/*! ./bodies/line */ "./src/bodies/line.ts");
-const intersect_1 = __webpack_require__(/*! ./intersect */ "./src/intersect.ts");
-const model_1 = __webpack_require__(/*! ./model */ "./src/model.ts");
-const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
-const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 /**
  * collision system
  */
@@ -5136,7 +5172,7 @@ class System extends base_system_1.BaseSystem {
         }
         // unique
         return collisionPoints.filter(({ x, y }, index) => index ===
-            collisionPoints.findIndex((collisionPoint) => collisionPoint.x === x && collisionPoint.y === y));
+            collisionPoints.findIndex((collisionPoint) => (0, utils_1.pointsEqual)(collisionPoint, { x, y })));
     }
 }
 exports.System = System;
@@ -5154,9 +5190,12 @@ exports.System = System;
 
 /* tslint:disable:cyclomatic-complexity */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RAD2DEG = exports.DEG2RAD = void 0;
+exports.EPSILON = exports.RAD2DEG = exports.DEG2RAD = void 0;
 exports.deg2rad = deg2rad;
 exports.rad2deg = rad2deg;
+exports.almostEqual = almostEqual;
+exports.pointsEqual = pointsEqual;
+exports.getWorldPoints = getWorldPoints;
 exports.createEllipse = createEllipse;
 exports.createBox = createBox;
 exports.ensureVectorPoint = ensureVectorPoint;
@@ -5184,10 +5223,10 @@ exports.bin2dec = bin2dec;
 exports.ensureNumber = ensureNumber;
 exports.groupBits = groupBits;
 exports.move = move;
-const sat_1 = __webpack_require__(/*! sat */ "./node_modules/sat/SAT.js");
-const intersect_1 = __webpack_require__(/*! ./intersect */ "./src/intersect.ts");
 const model_1 = __webpack_require__(/*! ./model */ "./src/model.ts");
+const intersect_1 = __webpack_require__(/*! ./intersect */ "./src/intersect.ts");
 const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
+const sat_1 = __webpack_require__(/*! sat */ "./node_modules/sat/SAT.js");
 /* helpers for faster getSATTest() and checkAInB() */
 const testMap = {
     satCircleCircle: sat_1.testCircleCircle,
@@ -5215,6 +5254,7 @@ const polygonSATFunctions = createArray(model_1.BodyType.Polygon, 'sat');
 const polygonInFunctions = createArray(model_1.BodyType.Polygon, 'in');
 exports.DEG2RAD = Math.PI / 180;
 exports.RAD2DEG = 180 / Math.PI;
+exports.EPSILON = 1e-9;
 /**
  * convert from degrees to radians
  */
@@ -5226,6 +5266,40 @@ function deg2rad(degrees) {
  */
 function rad2deg(radians) {
     return radians * exports.RAD2DEG;
+}
+/**
+ * Compares two numbers for approximate equality within a given tolerance.
+ *
+ * Useful for floating-point calculations where exact equality (`===`)
+ * is unreliable due to rounding errors.
+ *
+ * @param {number} a - First number to compare
+ * @param {number} b - Second number to compare
+ * @param {number} [eps=EPSILON] - Allowed tolerance (default: global EPSILON)
+ * @returns {boolean} `true` if numbers differ by less than `eps`
+ */
+function almostEqual(a, b, eps = exports.EPSILON) {
+    return Math.abs(a - b) < eps;
+}
+/**
+ * Compares two vectors for approximate equality within a tolerance.
+ *
+ * Uses {@link almostEqual} on both `x` and `y` coordinates.
+ * Two points are considered equal if both coordinates are
+ * within the allowed tolerance.
+ *
+ * @param {Vector} a - First vector
+ * @param {Vector} b - Second vector
+ * @returns {boolean} `true` if both vectors are approximately equal
+ */
+function pointsEqual(a, b) {
+    return almostEqual(a.x, b.x) && almostEqual(a.y, b.y);
+}
+function getWorldPoints({ calcPoints, pos }) {
+    return (0, optimized_1.map)(calcPoints, ({ x, y }) => ({
+        x: x + pos.x,
+        y: y + pos.y
+    }));
 }
 /**
  * creates ellipse-shaped polygon based on params

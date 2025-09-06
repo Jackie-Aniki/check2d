@@ -8,6 +8,18 @@ import { Polygon } from './bodies/polygon';
 import { System } from './system';
 import RBush from './external/rbush';
 export { Point as DecompPoint, Polygon as DecompPolygon, isSimple, quickDecomp } from 'poly-decomp-es';
+export type PolygonLike = {
+    pos: Vector;
+    calcPoints: Vector[];
+};
+export type CircleLike = {
+    pos: Vector;
+    r: number;
+};
+export type LineLike = {
+    start: Vector;
+    end: Vector;
+};
 export interface BBox {
     minX: number;
     minY: number;

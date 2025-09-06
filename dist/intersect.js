@@ -13,11 +13,13 @@ exports.circleOutsidePolygon = circleOutsidePolygon;
 exports.intersectLineCircle = intersectLineCircle;
 exports.intersectLineLineFast = intersectLineLineFast;
 exports.intersectLineLine = intersectLineLine;
+exports.intersectPolygonPolygon = intersectPolygonPolygon;
 exports.intersectLinePolygon = intersectLinePolygon;
 exports.intersectCircleCircle = intersectCircleCircle;
-const sat_1 = require("sat");
 const model_1 = require("./model");
 const optimized_1 = require("./optimized");
+const sat_1 = require("sat");
+const utils_1 = require("./utils");
 /**
  * replace body with array of related convex polygons
  */
@@ -216,7 +218,7 @@ function intersectLineLine(line1, line2) {
     const dX = line1.end.x - line1.start.x;
     const dY = line1.end.y - line1.start.y;
     const determinant = dX * (line2.end.y - line2.start.y) - (line2.end.x - line2.start.x) * dY;
-    if (determinant === 0) {
+    if (Math.abs(determinant) < Number.EPSILON) {
         return;
     }
     const lambda = ((line2.end.y - line2.start.y) * (line2.end.x - line1.start.x) +
@@ -225,12 +227,46 @@ function intersectLineLine(line1, line2) {
     const gamma = ((line1.start.y - line1.end.y) * (line2.end.x - line1.start.x) +
         dX * (line2.end.y - line1.start.y)) /
         determinant;
-    // check if there is an intersection
-    if (!(lambda >= 0 && lambda <= 1) || !(gamma >= 0 && gamma <= 1)) {
+    // stricter check – no eps fudge, only inside [0,1]
+    if (lambda < 0 || lambda > 1 || gamma < 0 || gamma > 1) {
         return;
     }
     return { x: line1.start.x + lambda * dX, y: line1.start.y + lambda * dY };
 }
+/**
+ * Computes all intersection points between two polygons.
+ *
+ * Iterates over each edge of `polygonA` and checks against `polygonB`
+ * using {@link intersectLinePolygon}.
+ * Removes duplicates.
+ * Also detects corner–corner touches.
+ *
+ * @param {PolygonLike} polygonA - First polygon
+ * @param {PolygonLike} polygonB - Second polygon
+ * @returns {Vector[]} Array of intersection points (empty if none found)
+ */
+function intersectPolygonPolygon(polygonA, polygonB) {
+    const pointsA = (0, utils_1.getWorldPoints)(polygonA);
+    const pointsB = (0, utils_1.getWorldPoints)(polygonB);
+    const results = [];
+    (0, optimized_1.forEach)(pointsA, (start, index) => {
+        const end = pointsA[(index + 1) % pointsA.length];
+        (0, optimized_1.forEach)(intersectLinePolygon({ start, end }, { pos: { x: 0, y: 0 }, calcPoints: pointsB }), ({ x, y }) => {
+            // add unique
+            if (!results.find((point) => x === point.x && y === point.y)) {
+                results.push({ x, y });
+            }
+        });
+    });
+    return results;
+}
+/**
+ * Computes all intersection points between a line segment and a polygon.
+ *
+ * @param {LineLike} line - The line segment
+ * @param {PolygonLike} polygon - A polygon object or array of global points
+ * @returns {Vector[]} Array of intersection points (empty if none)
+ */
 function intersectLinePolygon(line, polygon) {
     const results = [];
     (0, optimized_1.forEach)(polygon.calcPoints, (to, index) => {

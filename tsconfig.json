@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["ES2015", "ES2017.Object", "DOM"],
+    "lib": ["ES2016", "ES2017.Object", "DOM"],
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "strict": true,

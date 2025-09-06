@@ -5,7 +5,9 @@ const {
   Circle,
   intersectLineLine,
   intersectLineCircle,
-  circleOutsidePolygon
+  intersectPolygonPolygon,
+  circleOutsidePolygon,
+  getWorldPoints
 } = require('.')
 
 describe('GIVEN Intersect Utils', () => {
@@ -440,5 +442,70 @@ describe('GIVEN Intersect Utils', () => {
     expect(physics.response.bInA).toBe(false)
 
     expect(physics.checkCollision(circle, line)).toBe(false)
+  })
+
+  describe('WHEN using intersectPolygonPolygon', () => {
+    it('THEN it returns empty array when polygons do not touch', () => {
+      const { System } = require('.')
+      const physics = new System()
+      const square1 = physics.createPolygon({}, [
+        { x: 0, y: 0 },
+        { x: 0, y: 10 },
+        { x: 10, y: 10 },
+        { x: 10, y: 0 }
+      ])
+      const square2 = physics.createPolygon({}, [
+        { x: 20, y: 20 },
+        { x: 20, y: 30 },
+        { x: 30, y: 30 },
+        { x: 30, y: 20 }
+      ])
+
+      const result = intersectPolygonPolygon(square1, square2)
+
+      expect(result).toStrictEqual([])
+    })
+
+    it('THEN it detects edge intersections between overlapping squares', () => {
+      const { System } = require('.')
+      const physics = new System()
+      const square1 = physics.createPolygon({}, [
+        { x: 0, y: 0 },
+        { x: 0, y: 10 },
+        { x: 10, y: 10 },
+        { x: 10, y: 0 }
+      ])
+      const square2 = physics.createPolygon({}, [
+        { x: 5, y: 5 },
+        { x: 5, y: 15 },
+        { x: 15, y: 15 },
+        { x: 15, y: 5 }
+      ])
+
+      const result = intersectPolygonPolygon(square1, square2)
+
+      expect(result.length).toBeGreaterThan(0)
+    })
+
+    it('THEN it detects single corner touch', () => {
+      const { System } = require('.')
+      const physics = new System()
+      const square1 = physics.createPolygon({}, [
+        { x: 0, y: 0 },
+        { x: 0, y: 10 },
+        { x: 10, y: 10 },
+        { x: 10, y: 0 }
+      ])
+      const square2 = physics.createPolygon({}, [
+        { x: 10, y: 10 },
+        { x: 10, y: 20 },
+        { x: 20, y: 20 },
+        { x: 20, y: 10 }
+      ])
+
+      const result = intersectPolygonPolygon(square1, square2)
+
+      expect(result).toStrictEqual([{ x: 10, y: 10 }])
+    })
   })
 })

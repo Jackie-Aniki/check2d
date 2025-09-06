@@ -1,19 +1,6 @@
 /* tslint:disable:cyclomatic-complexity */
 
 import {
-  testCircleCircle,
-  testCirclePolygon,
-  testPolygonCircle,
-  testPolygonPolygon
-} from 'sat'
-import { Polygon } from './bodies/polygon'
-import {
-  circleInCircle,
-  circleInPolygon,
-  polygonInCircle,
-  polygonInPolygon
-} from './intersect'
-import {
   BBox,
   Body,
   BodyGroup,
@@ -21,6 +8,7 @@ import {
   BodyType,
   DecompPoint,
   InTest,
+  PolygonLike,
   PotentialVector,
   Response,
   SATPolygon,
@@ -28,7 +16,21 @@ import {
   SATVector,
   Vector
 } from './model'
+import {
+  circleInCircle,
+  circleInPolygon,
+  polygonInCircle,
+  polygonInPolygon
+} from './intersect'
 import { forEach, map } from './optimized'
+import {
+  testCircleCircle,
+  testCirclePolygon,
+  testPolygonCircle,
+  testPolygonPolygon
+} from 'sat'
+
+import { Polygon } from './bodies/polygon'
 
 /* helpers for faster getSATTest() and checkAInB() */
 
@@ -72,6 +74,8 @@ export const DEG2RAD = Math.PI / 180
 
 export const RAD2DEG = 180 / Math.PI
 
+export const EPSILON = 1e-9
+
 /**
  * convert from degrees to radians
  */
@@ -84,6 +88,46 @@ export function deg2rad(degrees: number) {
  */
 export function rad2deg(radians: number) {
   return radians * RAD2DEG
+}
+/**
+ * Compares two numbers for approximate equality within a given tolerance.
+ *
+ * Useful for floating-point calculations where exact equality (`===`)
+ * is unreliable due to rounding errors.
+ *
+ * @param {number} a - First number to compare
+ * @param {number} b - Second number to compare
+ * @param {number} [eps=EPSILON] - Allowed tolerance (default: global EPSILON)
+ * @returns {boolean} `true` if numbers differ by less than `eps`
+ */
+export function almostEqual(
+  a: number,
+  b: number,
+  eps: number = EPSILON
+): boolean {
+  return Math.abs(a - b) < eps
+}
+
+/**
+ * Compares two vectors for approximate equality within a tolerance.
+ *
+ * Uses {@link almostEqual} on both `x` and `y` coordinates.
+ * Two points are considered equal if both coordinates are
+ * within the allowed tolerance.
+ *
+ * @param {Vector} a - First vector
+ * @param {Vector} b - Second vector
+ * @returns {boolean} `true` if both vectors are approximately equal
+ */
+export function pointsEqual(a: Vector, b: Vector): boolean {
+  return almostEqual(a.x, b.x) && almostEqual(a.y, b.y)
+}
+
+export function getWorldPoints({ calcPoints, pos }: PolygonLike): Vector[] {
+  return map(calcPoints, ({ x, y }) => ({
+    x: x + pos.x,
+    y: y + pos.y
+  }))
 }
 
 /**

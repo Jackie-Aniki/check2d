@@ -1,13 +1,23 @@
 /* tslint:disable:trailing-whitespace */
 /* tslint:disable:cyclomatic-complexity */
 
-import { pointInCircle, pointInPolygon as pointInConvexPolygon } from 'sat'
-import { Body, BodyGroup, SATPolygon, SATVector, Vector } from './model'
+import {
+  Body,
+  BodyGroup,
+  CircleLike,
+  LineLike,
+  PolygonLike,
+  SATPolygon,
+  SATVector,
+  Vector
+} from './model'
 import { every, forEach, map, some } from './optimized'
-import { Circle } from './bodies/circle'
-import { Line } from './bodies/line'
-import { Point } from './bodies/point'
-import { Polygon } from './bodies/polygon'
+import { pointInCircle, pointInPolygon as pointInConvexPolygon } from 'sat'
+
+import { type Circle } from './bodies/circle'
+import { type Point } from './bodies/point'
+import { type Polygon } from './bodies/polygon'
+import { getWorldPoints } from './utils'
 
 /**
  * replace body with array of related convex polygons
@@ -26,17 +36,14 @@ export function ensureConvex<TBody extends Body = Circle | Point | Polygon>(
  * @param polygon
  * @param circle
  */
-export function polygonInCircle(
-  polygon: Polygon,
-  circle: Pick<Circle, 'pos' | 'r'>
-): boolean {
+export function polygonInCircle(polygon: Polygon, circle: CircleLike): boolean {
   return every(polygon.calcPoints, (p) => {
     const point = {
       x: p.x + polygon.pos.x,
       y: p.y + polygon.pos.y
     } as SATVector
 
-    return pointInCircle(point, circle)
+    return pointInCircle(point, circle as Circle)
   })
 }
 
@@ -64,10 +71,7 @@ export function polygonInPolygon(
  * @param point
  * @param circle
  */
-export function pointOnCircle(
-  point: Vector,
-  circle: Pick<Circle, 'pos' | 'r'>
-): boolean {
+export function pointOnCircle(point: Vector, circle: CircleLike): boolean {
   return (
     (point.x - circle.pos.x) * (point.x - circle.pos.x) +
       (point.y - circle.pos.y) * (point.y - circle.pos.y) ===
@@ -81,10 +85,7 @@ export function pointOnCircle(
  * @param circle1
  * @param circle2
  */
-export function circleInCircle(
-  circle1: Pick<Circle, 'pos' | 'r'>,
-  circle2: Pick<Circle, 'pos' | 'r'>
-) {
+export function circleInCircle(circle1: CircleLike, circle2: CircleLike) {
   const x1 = circle1.pos.x
   const y1 = circle1.pos.y
   const x2 = circle2.pos.x
@@ -102,10 +103,7 @@ export function circleInCircle(
  * @param circle
  * @param polygon
  */
-export function circleInPolygon(
-  circle: Pick<Circle, 'pos' | 'r'>,
-  polygon: Polygon
-): boolean {
+export function circleInPolygon(circle: CircleLike, polygon: Polygon): boolean {
   // Circle with radius 0 isn't a circle
   if (circle.r === 0) {
     return false
@@ -127,7 +125,7 @@ export function circleInPolygon(
   // If the center of the circle is within the polygon,
   // the circle is not outside of the polygon completely.
   // so return false.
-  if (some(points, (point) => pointInCircle(point, circle))) {
+  if (some(points, (point) => pointInCircle(point, circle as Circle))) {
     return false
   }
 
@@ -156,7 +154,7 @@ export function circleInPolygon(
  * @param polygon
  */
 export function circleOutsidePolygon(
-  circle: Pick<Circle, 'pos' | 'r'>,
+  circle: CircleLike,
   polygon: Polygon
 ): boolean {
   // Circle with radius 0 isn't a circle
@@ -183,7 +181,8 @@ export function circleOutsidePolygon(
   if (
     some(
       points,
-      (point) => pointInCircle(point, circle) || pointOnCircle(point, circle)
+      (point) =>
+        pointInCircle(point, circle as Circle) || pointOnCircle(point, circle)
     )
   ) {
     return false
@@ -214,8 +213,8 @@ export function circleOutsidePolygon(
  * @param circle
  */
 export function intersectLineCircle(
-  line: Pick<Line, 'start' | 'end'>,
-  { pos, r }: Pick<Circle, 'pos' | 'r'>
+  line: LineLike,
+  { pos, r }: CircleLike
 ): Vector[] {
   const v1 = { x: line.end.x - line.start.x, y: line.end.y - line.start.y }
   const v2 = { x: line.start.x - pos.x, y: line.start.y - pos.y }
@@ -263,8 +262,8 @@ function isTurn(point1: Vector, point2: Vector, point3: Vector) {
  * @param line2
  */
 export function intersectLineLineFast(
-  line1: Pick<Line, 'start' | 'end'>,
-  line2: Pick<Line, 'start' | 'end'>
+  line1: LineLike,
+  line2: LineLike
 ): boolean {
   return (
     isTurn(line1.start, line2.start, line2.end) !==
@@ -282,8 +281,8 @@ export function intersectLineLineFast(
  * @param line2
  */
 export function intersectLineLine(
-  line1: Pick<Line, 'start' | 'end'>,
-  line2: Pick<Line, 'start' | 'end'>
+  line1: LineLike,
+  line2: LineLike
 ): Vector | undefined {
   const dX: number = line1.end.x - line1.start.x
   const dY: number = line1.end.y - line1.start.y
@@ -291,7 +290,7 @@ export function intersectLineLine(
   const determinant: number =
     dX * (line2.end.y - line2.start.y) - (line2.end.x - line2.start.x) * dY
 
-  if (determinant === 0) {
+  if (Math.abs(determinant) < Number.EPSILON) {
     return
   }
 
@@ -305,17 +304,64 @@ export function intersectLineLine(
       dX * (line2.end.y - line1.start.y)) /
     determinant
 
-  // check if there is an intersection
-  if (!(lambda >= 0 && lambda <= 1) || !(gamma >= 0 && gamma <= 1)) {
+  // stricter check – no eps fudge, only inside [0,1]
+  if (lambda < 0 || lambda > 1 || gamma < 0 || gamma > 1) {
     return
   }
 
   return { x: line1.start.x + lambda * dX, y: line1.start.y + lambda * dY }
 }
 
+/**
+ * Computes all intersection points between two polygons.
+ *
+ * Iterates over each edge of `polygonA` and checks against `polygonB`
+ * using {@link intersectLinePolygon}.
+ * Removes duplicates.
+ * Also detects corner–corner touches.
+ *
+ * @param {PolygonLike} polygonA - First polygon
+ * @param {PolygonLike} polygonB - Second polygon
+ * @returns {Vector[]} Array of intersection points (empty if none found)
+ */
+export function intersectPolygonPolygon(
+  polygonA: PolygonLike,
+  polygonB: PolygonLike
+): Vector[] {
+  const pointsA = getWorldPoints(polygonA)
+  const pointsB = getWorldPoints(polygonB)
+  const results: Vector[] = []
+
+  forEach(pointsA, (start, index) => {
+    const end = pointsA[(index + 1) % pointsA.length]
+
+    forEach(
+      intersectLinePolygon(
+        { start, end },
+        { pos: { x: 0, y: 0 }, calcPoints: pointsB }
+      ),
+      ({ x, y }: Vector) => {
+        // add unique
+        if (!results.find((point) => x === point.x && y === point.y)) {
+          results.push({ x, y })
+        }
+      }
+    )
+  })
+
+  return results
+}
+
+/**
+ * Computes all intersection points between a line segment and a polygon.
+ *
+ * @param {LineLike} line - The line segment
+ * @param {PolygonLike} polygon - A polygon object or array of global points
+ * @returns {Vector[]} Array of intersection points (empty if none)
+ */
 export function intersectLinePolygon(
-  line: Pick<Line, 'start' | 'end'>,
-  polygon: Polygon
+  line: LineLike,
+  polygon: PolygonLike
 ): Vector[] {
   const results: Vector[] = []
 

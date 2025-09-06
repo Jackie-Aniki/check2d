@@ -1,5 +1,5 @@
 {
-  "name": "detect-collisions",
+  "name": "check2d",
   "version": "9.27.6",
   "description": "Points, Lines, Boxes, Polygons (also hollow), Ellipses, Circles. RayCasting, offsets, rotation, scaling, bounding box padding, flags for static and ghost/trigger bodies",
   "main": "./dist/index.js",

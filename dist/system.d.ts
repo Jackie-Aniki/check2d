@@ -1,6 +1,6 @@
+import { BBox, Body, CollisionCallback, RaycastHit, Response, Vector } from './model';
 import { BaseSystem } from './base-system';
 import { Line } from './bodies/line';
-import { BBox, Body, CollisionCallback, RaycastHit, Response, Vector } from './model';
 /**
  * collision system
  */
