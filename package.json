@@ -1,6 +1,6 @@
 {
   "name": "check2d",
-  "version": "9.29.1",
+  "version": "9.29.2",
   "description": "Points, Lines, Boxes, Polygons (also hollow), Ellipses, Circles. RayCasting, offsets, rotation, scaling, bounding box padding, flags for static and ghost/trigger bodies",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -212,7 +212,3 @@ npm i && npm run build # will build & run tests & run benchmarks
 ## License
 
 MIT
-
-## You can buy me a coffee
-
-<https://paypal.me/jacekpietal>
