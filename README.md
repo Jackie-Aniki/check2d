@@ -6,7 +6,7 @@
 
 ## Introduction
 
-check2d 💫 is a lightning-fast ⚡️ TypeScript library built to detect collisions between diverse shapes like Points, Lines, Boxes, Polygons (including concave), Ellipses, and Circles. Utilizing Bounding Volume Hierarchy (BVH) and the Separating Axis Theorem (SAT), it offers rapid and accurate collision detection. The library supports RayCasting, offsets, rotation, scaling, and optimizations for: bounding box, flags for non-moving and ghost/trigger bodies and collision groups filtering - making it an ideal choice for high-speed applications in gaming and simulations.
+`check2d` is a lightning-fast ⚡️ TypeScript library built to detect collisions between diverse shapes like Points, Lines, Boxes, Polygons (including concave), Ellipses, and Circles. Utilizing Bounding Volume Hierarchy (BVH) and the Separating Axis Theorem (SAT), it offers rapid and accurate collision detection. The library supports RayCasting, offsets, rotation, scaling, and optimizations for: bounding box, flags for non-moving and ghost/trigger bodies and collision groups filtering - making it an ideal choice for high-speed applications in gaming and simulations.
 
 ## Demos
 

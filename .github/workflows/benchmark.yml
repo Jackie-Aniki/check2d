@@ -1,4 +1,4 @@
-name: check2d benchmarks
+name: check2d-benchmarks
 
 on:
   # Manual run
