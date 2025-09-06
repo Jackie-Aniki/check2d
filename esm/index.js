@@ -3421,7 +3421,7 @@ class Box extends Polygon {
     }
     /**
      * after setting width/height update translate
-     * see https://github.com/Prozi/detect-collisions/issues/70
+     * see https://github.com/eikichi-onizuka-sensei/check2d/issues/70
      */
     afterUpdateSize() {
         this.setPoints(createBox(this._width, this._height));
@@ -3689,7 +3689,7 @@ class System extends BaseSystem {
      */
     insert(body) {
         const insertResult = super.insert(body);
-        // set system for later body.system.updateBody(body)
+        // set system for later body.check2d.updateBody(body)
         body.system = this;
         return insertResult;
     }

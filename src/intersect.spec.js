@@ -26,19 +26,19 @@ describe('GIVEN Intersect Utils', () => {
   })
 
   it('THEN circleOutsidePolygon should work', () => {
-    const system = new System()
+    const check2d = new System()
     const box1 = new Box({ x: 115, y: 152 }, 100, 100)
     const circle1 = new Circle({ x: 100, y: 100 }, 50)
-    system.insert(box1)
-    system.insert(circle1)
+    check2d.insert(box1)
+    check2d.insert(circle1)
 
     expect(circleOutsidePolygon(circle1, box1)).toBe(true)
   })
 
   it('THEN circle inside concave polygon have correct aInB, bInA', () => {
     const { System } = require('.')
-    const physics = new System()
-    const concave = physics.createPolygon(
+    const check2d = new System()
+    const concave = check2d.createPolygon(
       { x: 200, y: 100 },
       [
         { x: -11.25, y: -6.76 },
@@ -55,19 +55,19 @@ describe('GIVEN Intersect Utils', () => {
         { x: -11.25, y: -7.51 }
       ].map(({ x, y }) => ({ x: x * 10, y: y * 10 }))
     )
-    const convex = physics.createCircle({ x: 71.2, y: 37.5 }, 1)
+    const convex = check2d.createCircle({ x: 71.2, y: 37.5 }, 1)
 
-    physics.checkCollision(convex, concave)
+    check2d.checkCollision(convex, concave)
 
-    expect(physics.response.aInB).toBe(true)
-    expect(physics.response.bInA).toBe(false)
+    expect(check2d.response.aInB).toBe(true)
+    expect(check2d.response.bInA).toBe(false)
   })
 
   it('THEN concave polygon inside circle have correct aInB, bInA', () => {
     const { System } = require('.')
-    const physics = new System()
-    const convex = physics.createCircle({ x: -5, y: 3.75 }, 40)
-    const concave = physics.createPolygon(
+    const check2d = new System()
+    const convex = check2d.createCircle({ x: -5, y: 3.75 }, 40)
+    const concave = check2d.createPolygon(
       { x: -5, y: 3.75 },
       [
         { x: -11.25, y: -6.76 },
@@ -85,16 +85,16 @@ describe('GIVEN Intersect Utils', () => {
       ].map(({ x, y }) => ({ x: x * 0.01, y: y * 0.01 }))
     )
 
-    physics.checkCollision(concave, convex)
+    check2d.checkCollision(concave, convex)
 
-    expect(physics.response.aInB).toBe(true)
-    expect(physics.response.bInA).toBe(false)
+    expect(check2d.response.aInB).toBe(true)
+    expect(check2d.response.bInA).toBe(false)
   })
 
   it('THEN concave polygon inside concave polygon have correct aInB, bInA', () => {
     const { System } = require('.')
-    const physics = new System()
-    const concave = physics.createPolygon(
+    const check2d = new System()
+    const concave = check2d.createPolygon(
       { x: -200, y: -300 },
       [
         { x: 190, y: 147 },
@@ -104,7 +104,7 @@ describe('GIVEN Intersect Utils', () => {
         { x: 80, y: 350 }
       ].map(({ x, y }) => ({ x: x * 2, y: y * 2 }))
     )
-    const concaveInside = physics.createPolygon({ x: 0, y: 0 }, [
+    const concaveInside = check2d.createPolygon({ x: 0, y: 0 }, [
       { x: 190, y: 147 },
       { x: 256, y: 265 },
       { x: 400, y: 274 },
@@ -112,17 +112,17 @@ describe('GIVEN Intersect Utils', () => {
       { x: 80, y: 350 }
     ])
 
-    physics.checkCollision(concave, concaveInside)
+    check2d.checkCollision(concave, concaveInside)
 
-    expect(physics.response.aInB).toBe(false)
-    expect(physics.response.bInA).toBe(true)
+    expect(check2d.response.aInB).toBe(false)
+    expect(check2d.response.bInA).toBe(true)
   })
 
   it('THEN circle and line inside concave aInB works', () => {
     const { System } = require('.')
-    const physics = new System()
+    const check2d = new System()
 
-    const line = physics.createLine(
+    const line = check2d.createLine(
       {
         x: 338.814694511791 + 152.89343950920775,
         y: 15.538920669710976 + 123.4220026097263
@@ -424,37 +424,37 @@ describe('GIVEN Intersect Utils', () => {
       }
     ]
 
-    const area = physics.createPolygon(
+    const area = check2d.createPolygon(
       { x: 144.71938174052755, y: 113.40348796741262 },
       points
     )
 
-    const circle = physics.createCircle({ x: 200, y: 232 }, 3)
+    const circle = check2d.createCircle({ x: 200, y: 232 }, 3)
 
-    expect(physics.checkCollision(line, area)).toBe(true)
+    expect(check2d.checkCollision(line, area)).toBe(true)
 
-    expect(physics.response.aInB).toBe(true)
-    expect(physics.response.bInA).toBe(false)
+    expect(check2d.response.aInB).toBe(true)
+    expect(check2d.response.bInA).toBe(false)
 
-    expect(physics.checkCollision(circle, area)).toBe(true)
+    expect(check2d.checkCollision(circle, area)).toBe(true)
 
-    expect(physics.response.aInB).toBe(true)
-    expect(physics.response.bInA).toBe(false)
+    expect(check2d.response.aInB).toBe(true)
+    expect(check2d.response.bInA).toBe(false)
 
-    expect(physics.checkCollision(circle, line)).toBe(false)
+    expect(check2d.checkCollision(circle, line)).toBe(false)
   })
 
   describe('WHEN using intersectPolygonPolygon', () => {
     it('THEN it returns empty array when polygons do not touch', () => {
       const { System } = require('.')
-      const physics = new System()
-      const square1 = physics.createPolygon({}, [
+      const check2d = new System()
+      const square1 = check2d.createPolygon({}, [
         { x: 0, y: 0 },
         { x: 0, y: 10 },
         { x: 10, y: 10 },
         { x: 10, y: 0 }
       ])
-      const square2 = physics.createPolygon({}, [
+      const square2 = check2d.createPolygon({}, [
         { x: 20, y: 20 },
         { x: 20, y: 30 },
         { x: 30, y: 30 },
@@ -468,14 +468,14 @@ describe('GIVEN Intersect Utils', () => {
 
     it('THEN it detects edge intersections between overlapping squares', () => {
       const { System } = require('.')
-      const physics = new System()
-      const square1 = physics.createPolygon({}, [
+      const check2d = new System()
+      const square1 = check2d.createPolygon({}, [
         { x: 0, y: 0 },
         { x: 0, y: 10 },
         { x: 10, y: 10 },
         { x: 10, y: 0 }
       ])
-      const square2 = physics.createPolygon({}, [
+      const square2 = check2d.createPolygon({}, [
         { x: 5, y: 5 },
         { x: 5, y: 15 },
         { x: 15, y: 15 },
@@ -489,14 +489,14 @@ describe('GIVEN Intersect Utils', () => {
 
     it('THEN it detects single corner touch', () => {
       const { System } = require('.')
-      const physics = new System()
-      const square1 = physics.createPolygon({}, [
+      const check2d = new System()
+      const square1 = check2d.createPolygon({}, [
         { x: 0, y: 0 },
         { x: 0, y: 10 },
         { x: 10, y: 10 },
         { x: 10, y: 0 }
       ])
-      const square2 = physics.createPolygon({}, [
+      const square2 = check2d.createPolygon({}, [
         { x: 10, y: 10 },
         { x: 10, y: 20 },
         { x: 20, y: 20 },

@@ -152,7 +152,7 @@ export declare function dashLineTo(context: CanvasRenderingContext2D, fromX: num
  * @param isTrigger
  */
 export declare function drawPolygon(context: CanvasRenderingContext2D, { pos, calcPoints }: Pick<Polygon | SATPolygon, 'calcPoints'> & {
-    pos: Vector;
+  pos: Vector;
 }, isTrigger?: boolean): void;
 /**
  * draw body bounding body box

@@ -15,8 +15,7 @@ function getDefaultCount() {
 class Stress {
   constructor(count = getDefaultCount()) {
     this.size = Math.sqrt((width * height) / (count * 50))
-
-    this.physics = new System(5)
+    this.check2d = new System(5)
     this.bodies = []
     this.polygons = 0
     this.boxes = 0
@@ -76,16 +75,16 @@ class Stress {
 
   getBounds() {
     return [
-      this.physics.createBox({ x: 0, y: 0 }, width, 10, {
+      this.check2d.createBox({ x: 0, y: 0 }, width, 10, {
         isStatic: true
       }),
-      this.physics.createBox({ x: width - 10, y: 0 }, 10, height, {
+      this.check2d.createBox({ x: width - 10, y: 0 }, 10, height, {
         isStatic: true
       }),
-      this.physics.createBox({ x: 0, y: height - 10 }, width, 10, {
+      this.check2d.createBox({ x: 0, y: height - 10 }, width, 10, {
         isStatic: true
       }),
-      this.physics.createBox({ x: 0, y: 0 }, 10, height, {
+      this.check2d.createBox({ x: 0, y: 0 }, 10, height, {
         isStatic: true
       })
     ]
@@ -93,7 +92,7 @@ class Stress {
 
   toggleFiltering() {
     this.enableFiltering = !this.enableFiltering
-    this.physics.clear()
+    this.check2d.clear()
     this.bodies.length = 0
     this.polygons = 0
     this.boxes = 0
@@ -153,7 +152,7 @@ class Stress {
       bounces.y += y
     }
 
-    this.physics.checkOne(body, addBounces)
+    this.check2d.checkOne(body, addBounces)
 
     if (bounces.x || bounces.y) {
       const size = 0.5 * (body.scaleX + body.scaleY)
@@ -196,7 +195,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Circle)
         }
-        body = this.physics.createCircle(
+        body = this.check2d.createCircle(
           { x, y },
           random(minSize, maxSize) / 2,
           options
@@ -211,7 +210,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Ellipse)
         }
-        body = this.physics.createEllipse({ x, y }, width, height, 2, options)
+        body = this.check2d.createEllipse({ x, y }, width, height, 2, options)
 
         ++this.ellipses
         break
@@ -220,7 +219,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Box)
         }
-        body = this.physics.createBox(
+        body = this.check2d.createBox(
           { x, y },
           random(minSize, maxSize),
           random(minSize, maxSize),
@@ -234,7 +233,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Line)
         }
-        body = this.physics.createLine(
+        body = this.check2d.createLine(
           { x, y },
           {
             x: x + random(minSize, maxSize),
@@ -250,7 +249,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Polygon)
         }
-        body = this.physics.createPolygon(
+        body = this.check2d.createPolygon(
           { x, y },
           [
             { x: -random(minSize, maxSize), y: random(minSize, maxSize) },

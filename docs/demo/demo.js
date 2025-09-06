@@ -1012,7 +1012,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// Version 0.9
 		(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
 		__WEBPACK_AMD_DEFINE_FACTORY__),
 		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-  } else {}
+  } else // removed by dead control flow
+{}
 }(this, function () {
   "use strict";
 
@@ -2052,14 +2053,14 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// Version 0.9
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BaseSystem = void 0;
 const model_1 = __webpack_require__(/*! ./model */ "./src/model.ts");
-const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
-const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 const box_1 = __webpack_require__(/*! ./bodies/box */ "./src/bodies/box.ts");
 const circle_1 = __webpack_require__(/*! ./bodies/circle */ "./src/bodies/circle.ts");
 const ellipse_1 = __webpack_require__(/*! ./bodies/ellipse */ "./src/bodies/ellipse.ts");
 const line_1 = __webpack_require__(/*! ./bodies/line */ "./src/bodies/line.ts");
 const point_1 = __webpack_require__(/*! ./bodies/point */ "./src/bodies/point.ts");
 const polygon_1 = __webpack_require__(/*! ./bodies/polygon */ "./src/bodies/polygon.ts");
+const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
 /**
  * very base collision system (create, insert, update, draw, remove)
  */
@@ -2280,7 +2281,7 @@ class Box extends polygon_1.Polygon {
     }
     /**
      * after setting width/height update translate
-     * see https://github.com/Prozi/detect-collisions/issues/70
+     * see https://github.com/eikichi-onizuka-sensei/check2d/issues/70
      */
     afterUpdateSize() {
         this.setPoints((0, utils_1.createBox)(this._width, this._height));
@@ -3152,14 +3153,14 @@ class TestCanvas {
       // Render the bodies
       this.context.strokeStyle = '#FFFFFF'
       this.context.beginPath()
-      this.test.physics.draw(this.context)
+      this.test.system.draw(this.context)
       this.context.stroke()
 
       // Render the BVH
       if (this.bvhCheckbox.checked) {
         this.context.strokeStyle = '#00FF00'
         this.context.beginPath()
-        this.test.physics.drawBVH(this.context)
+        this.test.system.drawBVH(this.context)
         this.context.stroke()
       }
 
@@ -3223,8 +3224,7 @@ function getDefaultCount() {
 class Stress {
   constructor(count = getDefaultCount()) {
     this.size = Math.sqrt((width * height) / (count * 50))
-
-    this.physics = new System(5)
+    this.check2d = new System(5)
     this.bodies = []
     this.polygons = 0
     this.boxes = 0
@@ -3284,16 +3284,16 @@ class Stress {
 
   getBounds() {
     return [
-      this.physics.createBox({ x: 0, y: 0 }, width, 10, {
+      this.check2d.createBox({ x: 0, y: 0 }, width, 10, {
         isStatic: true
       }),
-      this.physics.createBox({ x: width - 10, y: 0 }, 10, height, {
+      this.check2d.createBox({ x: width - 10, y: 0 }, 10, height, {
         isStatic: true
       }),
-      this.physics.createBox({ x: 0, y: height - 10 }, width, 10, {
+      this.check2d.createBox({ x: 0, y: height - 10 }, width, 10, {
         isStatic: true
       }),
-      this.physics.createBox({ x: 0, y: 0 }, 10, height, {
+      this.check2d.createBox({ x: 0, y: 0 }, 10, height, {
         isStatic: true
       })
     ]
@@ -3301,7 +3301,7 @@ class Stress {
 
   toggleFiltering() {
     this.enableFiltering = !this.enableFiltering
-    this.physics.clear()
+    this.check2d.clear()
     this.bodies.length = 0
     this.polygons = 0
     this.boxes = 0
@@ -3361,7 +3361,7 @@ class Stress {
       bounces.y += y
     }
 
-    this.physics.checkOne(body, addBounces)
+    this.check2d.checkOne(body, addBounces)
 
     if (bounces.x || bounces.y) {
       const size = 0.5 * (body.scaleX + body.scaleY)
@@ -3404,7 +3404,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Circle)
         }
-        body = this.physics.createCircle(
+        body = this.check2d.createCircle(
           { x, y },
           random(minSize, maxSize) / 2,
           options
@@ -3419,7 +3419,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Ellipse)
         }
-        body = this.physics.createEllipse({ x, y }, width, height, 2, options)
+        body = this.check2d.createEllipse({ x, y }, width, height, 2, options)
 
         ++this.ellipses
         break
@@ -3428,7 +3428,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Box)
         }
-        body = this.physics.createBox(
+        body = this.check2d.createBox(
           { x, y },
           random(minSize, maxSize),
           random(minSize, maxSize),
@@ -3442,7 +3442,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Line)
         }
-        body = this.physics.createLine(
+        body = this.check2d.createLine(
           { x, y },
           {
             x: x + random(minSize, maxSize),
@@ -3458,7 +3458,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Polygon)
         }
-        body = this.physics.createPolygon(
+        body = this.check2d.createPolygon(
           { x, y },
           [
             { x: -random(minSize, maxSize), y: random(minSize, maxSize) },
@@ -3505,7 +3505,7 @@ const { doc, width, height, loop } = __webpack_require__(/*! ./canvas */ "./src/
 
 class Tank {
   constructor() {
-    this.physics = new System()
+    this.check2d = new System()
     this.bodies = []
     this.player = this.createPlayer(400, 300)
 
@@ -3630,7 +3630,7 @@ class Tank {
   }
 
   handleCollisions() {
-    this.physics.checkAll(({ a, b, overlapV }) => {
+    this.check2d.checkAll(({ a, b, overlapV }) => {
       if (a.isTrigger || b.isTrigger) {
         return
       }
@@ -3653,7 +3653,7 @@ class Tank {
     this.playerTurret.setAngle(this.player.angle, false)
     this.playerTurret.setPosition(this.player.x, this.player.y)
 
-    const hit = this.physics.raycast(
+    const hit = this.check2d.raycast(
       this.playerTurret.start,
       this.playerTurret.end,
       (test) => test !== this.player
@@ -3672,12 +3672,12 @@ class Tank {
   createPlayer(x, y, size = 13) {
     const player =
       Math.random() < 0.5
-        ? this.physics.createCircle(
+        ? this.check2d.createCircle(
             { x: this.scaleX(x), y: this.scaleY(y) },
             this.scaleX(size / 2),
             { isCentered: true }
           )
-        : this.physics.createBox(
+        : this.check2d.createBox(
             { x: this.scaleX(x - size / 2), y: this.scaleY(y - size / 2) },
             this.scaleX(size),
             this.scaleX(size),
@@ -3688,8 +3688,8 @@ class Tank {
     player.setOffset({ x: -this.scaleX(size / 2), y: 0 })
     player.setAngle(0.2)
 
-    this.physics.updateBody(player)
-    this.playerTurret = this.physics.createLine(
+    this.check2d.updateBody(player)
+    this.playerTurret = this.check2d.createLine(
       player,
       { x: player.x + this.scaleX(20) + this.scaleY(20), y: player.y },
       { angle: 0.2, isTrigger: true }
@@ -3707,14 +3707,14 @@ class Tank {
   }
 
   createCircle(x, y, radius) {
-    this.physics.createCircle(
+    this.check2d.createCircle(
       { x: this.scaleX(x), y: this.scaleY(y) },
       this.scaleX(radius)
     )
   }
 
   createEllipse(x, y, radiusX, radiusY, step, angle) {
-    this.physics.createEllipse(
+    this.check2d.createEllipse(
       { x: this.scaleX(x), y: this.scaleY(y) },
       this.scaleX(radiusX),
       this.scaleY(radiusY),
@@ -3729,7 +3729,7 @@ class Tank {
       y: this.scaleY(pointY)
     }))
 
-    return this.physics.createPolygon(
+    return this.check2d.createPolygon(
       { x: this.scaleX(x), y: this.scaleY(y) },
       scaledPoints,
       { angle, isStatic: true }
@@ -4989,7 +4989,7 @@ class System extends base_system_1.BaseSystem {
      */
     insert(body) {
         const insertResult = super.insert(body);
-        // set system for later body.system.updateBody(body)
+        // set system for later body.check2d.updateBody(body)
         body.system = this;
         return insertResult;
     }

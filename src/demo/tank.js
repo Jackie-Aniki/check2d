@@ -5,7 +5,7 @@ const { doc, width, height, loop } = require('./canvas')
 
 class Tank {
   constructor() {
-    this.physics = new System()
+    this.check2d = new System()
     this.bodies = []
     this.player = this.createPlayer(400, 300)
 
@@ -130,7 +130,7 @@ class Tank {
   }
 
   handleCollisions() {
-    this.physics.checkAll(({ a, b, overlapV }) => {
+    this.check2d.checkAll(({ a, b, overlapV }) => {
       if (a.isTrigger || b.isTrigger) {
         return
       }
@@ -153,7 +153,7 @@ class Tank {
     this.playerTurret.setAngle(this.player.angle, false)
     this.playerTurret.setPosition(this.player.x, this.player.y)
 
-    const hit = this.physics.raycast(
+    const hit = this.check2d.raycast(
       this.playerTurret.start,
       this.playerTurret.end,
       (test) => test !== this.player
@@ -172,12 +172,12 @@ class Tank {
   createPlayer(x, y, size = 13) {
     const player =
       Math.random() < 0.5
-        ? this.physics.createCircle(
+        ? this.check2d.createCircle(
             { x: this.scaleX(x), y: this.scaleY(y) },
             this.scaleX(size / 2),
             { isCentered: true }
           )
-        : this.physics.createBox(
+        : this.check2d.createBox(
             { x: this.scaleX(x - size / 2), y: this.scaleY(y - size / 2) },
             this.scaleX(size),
             this.scaleX(size),
@@ -188,8 +188,8 @@ class Tank {
     player.setOffset({ x: -this.scaleX(size / 2), y: 0 })
     player.setAngle(0.2)
 
-    this.physics.updateBody(player)
-    this.playerTurret = this.physics.createLine(
+    this.check2d.updateBody(player)
+    this.playerTurret = this.check2d.createLine(
       player,
       { x: player.x + this.scaleX(20) + this.scaleY(20), y: player.y },
       { angle: 0.2, isTrigger: true }
@@ -207,14 +207,14 @@ class Tank {
   }
 
   createCircle(x, y, radius) {
-    this.physics.createCircle(
+    this.check2d.createCircle(
       { x: this.scaleX(x), y: this.scaleY(y) },
       this.scaleX(radius)
     )
   }
 
   createEllipse(x, y, radiusX, radiusY, step, angle) {
-    this.physics.createEllipse(
+    this.check2d.createEllipse(
       { x: this.scaleX(x), y: this.scaleY(y) },
       this.scaleX(radiusX),
       this.scaleY(radiusY),
@@ -229,7 +229,7 @@ class Tank {
       y: this.scaleY(pointY)
     }))
 
-    return this.physics.createPolygon(
+    return this.check2d.createPolygon(
       { x: this.scaleX(x), y: this.scaleY(y) },
       scaledPoints,
       { angle, isStatic: true }

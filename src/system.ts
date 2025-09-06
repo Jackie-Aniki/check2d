@@ -49,7 +49,7 @@ export class System<TBody extends Body = Body> extends BaseSystem<TBody> {
    */
   insert(body: TBody): this {
     const insertResult = super.insert(body)
-    // set system for later body.system.updateBody(body)
+    // set system for later body.check2d.updateBody(body)
     body.system = this
 
     return insertResult

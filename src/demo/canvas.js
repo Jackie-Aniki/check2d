@@ -59,14 +59,14 @@ class TestCanvas {
       // Render the bodies
       this.context.strokeStyle = '#FFFFFF'
       this.context.beginPath()
-      this.test.physics.draw(this.context)
+      this.test.system.draw(this.context)
       this.context.stroke()
 
       // Render the BVH
       if (this.bvhCheckbox.checked) {
         this.context.strokeStyle = '#00FF00'
         this.context.beginPath()
-        this.test.physics.drawBVH(this.context)
+        this.test.system.drawBVH(this.context)
         this.context.stroke()
       }
 
