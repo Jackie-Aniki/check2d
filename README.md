@@ -13,7 +13,7 @@
 - [Tank](https://onizuka-aniki.github.io/check2d/demo/)
 - [Stress Test](https://onizuka-aniki.github.io/check2d/demo/?stress)
 - [Stackblitz](https://stackblitz.com/edit/check2d)
-- [CodePan](https://code.pietal.dev/#/boilerplate/check2d?pans=html,console)
+- [CodePan](https://onizuka-aniki.github.io/codepan/#/boilerplate/check2d?pans=console,html)
 
 ## Installation
 
