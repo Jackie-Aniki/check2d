@@ -2,13 +2,13 @@
 
 import {
   BBox,
+  BasePolygon,
   Body,
   BodyGroup,
   BodyOptions,
   BodyType,
   DecompPoint,
   InTest,
-  PolygonLike,
   PotentialVector,
   Response,
   SATPolygon,
@@ -123,7 +123,13 @@ export function pointsEqual(a: Vector, b: Vector): boolean {
   return almostEqual(a.x, b.x) && almostEqual(a.y, b.y)
 }
 
-export function getWorldPoints({ calcPoints, pos }: PolygonLike): Vector[] {
+/**
+ * Converts calcPoints into simple x/y Vectors and adds polygon pos to them
+ *
+ * @param {BasePolygon} polygon
+ * @returns {Vector[]}
+ */
+export function getWorldPoints({ calcPoints, pos }: BasePolygon): Vector[] {
   return map(calcPoints, ({ x, y }) => ({
     x: x + pos.x,
     y: y + pos.y

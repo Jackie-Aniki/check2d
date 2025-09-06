@@ -1,4 +1,4 @@
-import { BBox, Body, BodyOptions, DecompPoint, PolygonLike, PotentialVector, Response, SATPolygon, SATTest, SATVector, Vector } from './model';
+import { BBox, BasePolygon, Body, BodyOptions, DecompPoint, PotentialVector, Response, SATPolygon, SATTest, SATVector, Vector } from './model';
 import { Polygon } from './bodies/polygon';
 export declare const DEG2RAD: number;
 export declare const RAD2DEG: number;
@@ -35,7 +35,13 @@ export declare function almostEqual(a: number, b: number, eps?: number): boolean
  * @returns {boolean} `true` if both vectors are approximately equal
  */
 export declare function pointsEqual(a: Vector, b: Vector): boolean;
-export declare function getWorldPoints({ calcPoints, pos }: PolygonLike): Vector[];
+/**
+ * Converts calcPoints into simple x/y Vectors and adds polygon pos to them
+ *
+ * @param {BasePolygon} polygon
+ * @returns {Vector[]}
+ */
+export declare function getWorldPoints({ calcPoints, pos }: BasePolygon): Vector[];
 /**
  * creates ellipse-shaped polygon based on params
  */
@@ -152,7 +158,7 @@ export declare function dashLineTo(context: CanvasRenderingContext2D, fromX: num
  * @param isTrigger
  */
 export declare function drawPolygon(context: CanvasRenderingContext2D, { pos, calcPoints }: Pick<Polygon | SATPolygon, 'calcPoints'> & {
-  pos: Vector;
+    pos: Vector;
 }, isTrigger?: boolean): void;
 /**
  * draw body bounding body box

@@ -1,6 +1,6 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
-  return (mod && mod.__esModule) ? mod : { "default": mod };
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BodyGroup = exports.BodyType = exports.SATVector = exports.SATPolygon = exports.SATCircle = exports.Response = exports.RBush = exports.quickDecomp = exports.isSimple = void 0;
@@ -20,22 +20,22 @@ Object.defineProperty(exports, "quickDecomp", { enumerable: true, get: function 
  */
 var BodyType;
 (function (BodyType) {
-  BodyType["Ellipse"] = "Ellipse";
-  BodyType["Circle"] = "Circle";
-  BodyType["Polygon"] = "Polygon";
-  BodyType["Box"] = "Box";
-  BodyType["Line"] = "Line";
-  BodyType["Point"] = "Point";
+    BodyType["Ellipse"] = "Ellipse";
+    BodyType["Circle"] = "Circle";
+    BodyType["Polygon"] = "Polygon";
+    BodyType["Box"] = "Box";
+    BodyType["Line"] = "Line";
+    BodyType["Point"] = "Point";
 })(BodyType || (exports.BodyType = BodyType = {}));
 /**
  * for groups
  */
 var BodyGroup;
 (function (BodyGroup) {
-  BodyGroup[BodyGroup["Ellipse"] = 32] = "Ellipse";
-  BodyGroup[BodyGroup["Circle"] = 16] = "Circle";
-  BodyGroup[BodyGroup["Polygon"] = 8] = "Polygon";
-  BodyGroup[BodyGroup["Box"] = 4] = "Box";
-  BodyGroup[BodyGroup["Line"] = 2] = "Line";
-  BodyGroup[BodyGroup["Point"] = 1] = "Point";
+    BodyGroup[BodyGroup["Ellipse"] = 32] = "Ellipse";
+    BodyGroup[BodyGroup["Circle"] = 16] = "Circle";
+    BodyGroup[BodyGroup["Polygon"] = 8] = "Polygon";
+    BodyGroup[BodyGroup["Box"] = 4] = "Box";
+    BodyGroup[BodyGroup["Line"] = 2] = "Line";
+    BodyGroup[BodyGroup["Point"] = 1] = "Point";
 })(BodyGroup || (exports.BodyGroup = BodyGroup = {}));

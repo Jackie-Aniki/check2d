@@ -25,17 +25,19 @@ export {
   quickDecomp
 } from 'poly-decomp-es'
 
-export type PolygonLike = {
+export type BasePoint = {
   pos: Vector
+}
+
+export type BasePolygon = BasePoint & {
   calcPoints: Vector[]
 }
 
-export type CircleLike = {
-  pos: Vector
+export type BaseCircle = BasePoint & {
   r: number
 }
 
-export type LineLike = {
+export type BaseLine = {
   start: Vector
   end: Vector
 }

@@ -2281,7 +2281,7 @@ class Box extends polygon_1.Polygon {
     }
     /**
      * after setting width/height update translate
-     * see https://github.com/eikichi-onizuka-sensei/check2d/issues/70
+     * see https://github.com/onizuka-aniki/check2d/issues/70
      */
     afterUpdateSize() {
         this.setPoints((0, utils_1.createBox)(this._width, this._height));
@@ -4532,11 +4532,8 @@ function ensureConvex(body) {
  * @param circle
  */
 function polygonInCircle(polygon, circle) {
-    return (0, optimized_1.every)(polygon.calcPoints, (p) => {
-        const point = {
-            x: p.x + polygon.pos.x,
-            y: p.y + polygon.pos.y
-        };
+    const points = (0, utils_1.getWorldPoints)(polygon);
+    return (0, optimized_1.every)(points, (point) => {
         return (0, sat_1.pointInCircle)(point, circle);
     });
 }
@@ -4544,7 +4541,8 @@ function pointInPolygon(point, polygon) {
     return (0, optimized_1.some)(ensureConvex(polygon), (convex) => (0, sat_1.pointInPolygon)(point, convex));
 }
 function polygonInPolygon(polygonA, polygonB) {
-    return (0, optimized_1.every)(polygonA.calcPoints, (point) => pointInPolygon({ x: point.x + polygonA.pos.x, y: point.y + polygonA.pos.y }, polygonB));
+    const points = (0, utils_1.getWorldPoints)(polygonA);
+    return (0, optimized_1.every)(points, (point) => pointInPolygon(point, polygonB));
 }
 /**
  * https://stackoverflow.com/a/68197894/1749528
@@ -4591,10 +4589,7 @@ function circleInPolygon(circle, polygon) {
         return false;
     }
     // Necessary add polygon pos to points
-    const points = (0, optimized_1.map)(polygon.calcPoints, ({ x, y }) => ({
-        x: x + polygon.pos.x,
-        y: y + polygon.pos.y
-    }));
+    const points = (0, utils_1.getWorldPoints)(polygon);
     // If the center of the circle is within the polygon,
     // the circle is not outside of the polygon completely.
     // so return false.
@@ -4632,14 +4627,12 @@ function circleOutsidePolygon(circle, polygon) {
         return false;
     }
     // Necessary add polygon pos to points
-    const points = (0, optimized_1.map)(polygon.calcPoints, ({ x, y }) => ({
-        x: x + polygon.pos.x,
-        y: y + polygon.pos.y
-    }));
+    const points = (0, utils_1.getWorldPoints)(polygon);
     // If the center of the circle is within the polygon,
     // the circle is not outside of the polygon completely.
     // so return false.
-    if ((0, optimized_1.some)(points, (point) => (0, sat_1.pointInCircle)(point, circle) || pointOnCircle(point, circle))) {
+    if ((0, optimized_1.some)(points, (point) => (0, sat_1.pointInCircle)(point, circle) ||
+        pointOnCircle(point, circle))) {
         return false;
     }
     // If any line-segment of the polygon intersects the circle,
@@ -4739,8 +4732,8 @@ function intersectLineLine(line1, line2) {
  * Removes duplicates.
  * Also detects corner–corner touches.
  *
- * @param {PolygonLike} polygonA - First polygon
- * @param {PolygonLike} polygonB - Second polygon
+ * @param {BasePolygon} polygonA - First polygon
+ * @param {BasePolygon} polygonB - Second polygon
  * @returns {Vector[]} Array of intersection points (empty if none found)
  */
 function intersectPolygonPolygon(polygonA, polygonB) {
@@ -4761,19 +4754,19 @@ function intersectPolygonPolygon(polygonA, polygonB) {
 /**
  * Computes all intersection points between a line segment and a polygon.
  *
- * @param {LineLike} line - The line segment
- * @param {PolygonLike} polygon - A polygon object or array of global points
+ * @param {BaseLine} line - The line segment
+ * @param {BasePolygon} polygon - A polygon object or array of global points
  * @returns {Vector[]} Array of intersection points (empty if none)
  */
-function intersectLinePolygon(line, polygon) {
+function intersectLinePolygon(line, { calcPoints, pos }) {
     const results = [];
-    (0, optimized_1.forEach)(polygon.calcPoints, (to, index) => {
+    (0, optimized_1.forEach)(calcPoints, (to, index) => {
         const from = index
-            ? polygon.calcPoints[index - 1]
-            : polygon.calcPoints[polygon.calcPoints.length - 1];
+            ? calcPoints[index - 1]
+            : calcPoints[calcPoints.length - 1];
         const side = {
-            start: { x: from.x + polygon.pos.x, y: from.y + polygon.pos.y },
-            end: { x: to.x + polygon.pos.x, y: to.y + polygon.pos.y }
+            start: { x: from.x + pos.x, y: from.y + pos.y },
+            end: { x: to.x + pos.x, y: to.y + pos.y }
         };
         const hit = intersectLineLine(line, side);
         if (hit) {
@@ -5295,6 +5288,12 @@ function almostEqual(a, b, eps = exports.EPSILON) {
 function pointsEqual(a, b) {
     return almostEqual(a.x, b.x) && almostEqual(a.y, b.y);
 }
+/**
+ * Converts calcPoints into simple x/y Vectors and adds polygon pos to them
+ *
+ * @param {BasePolygon} polygon
+ * @returns {Vector[]}
+ */
 function getWorldPoints({ calcPoints, pos }) {
     return (0, optimized_1.map)(calcPoints, ({ x, y }) => ({
         x: x + pos.x,
