@@ -2,7 +2,7 @@
 
 [<img src="https://img.shields.io/npm/v/check2d?style=for-the-badge&color=success" alt="npm version" />](https://www.npmjs.com/package/check2d?activeTab=versions)
 [<img src="https://img.shields.io/npm/dw/check2d.svg?style=for-the-badge&color=success" alt="npm downloads per week" />](https://www.npmjs.com/package/check2d)
-[<img src="https://img.shields.io/circleci/build/github/eikichi-onizuka-sensei/check2d/master?style=for-the-badge" alt="build status" />](https://app.circleci.com/pipelines/github/eikichi-onizuka-sensei/check2d)
+[<img src="https://img.shields.io/circleci/build/github/onizuka-aniki/check2d/master?style=for-the-badge" alt="build status" />](https://app.circleci.com/pipelines/github/onizuka-aniki/check2d)
 
 ## Introduction
 
@@ -10,8 +10,8 @@ check2d 💫 is a lightning-fast ⚡️ TypeScript library built to detect colli
 
 ## Demos
 
-- [Tank](https://eikichi-onizuka-sensei.github.io/check2d/demo/)
-- [Stress Test](https://eikichi-onizuka-sensei.github.io/check2d/demo/?stress)
+- [Tank](https://onizuka-aniki.github.io/check2d/demo/)
+- [Stress Test](https://onizuka-aniki.github.io/check2d/demo/?stress)
 - [Stackblitz](https://stackblitz.com/edit/check2d)
 - [CodePan](https://code.pietal.dev/#/boilerplate/check2d?pans=html,console)
 
@@ -25,7 +25,7 @@ npm i check2d --save
 
 For detailed documentation on the library's API, refer to the following link:
 
-[check2d API Documentation](https://eikichi-onizuka-sensei.github.io/check2d/)
+[check2d API Documentation](https://onizuka-aniki.github.io/check2d/)
 
 ## Usage
 
@@ -49,7 +49,7 @@ Bodies possess various properties:
 - **AABB Bounding Box**: Use `aabb: BBox` for inserted or `getAABBAsBBox(): BBox` for non inserted bodies to get the bounding box.
 - **Padding**: Use `padding: number` and set to nonzero value to reduce costly reinserts on attributes' change.
 - **Collision Filtering**: Use `group: number` for collision filtering, with a range within 0x0 ~ 0x7fffffff.
-- **Body Options**: [Read more in BodyOptions documentation](https://eikichi-onizuka-sensei.github.io/check2d/interfaces/BodyOptions.html)
+- **Body Options**: [Read more in BodyOptions documentation](https://onizuka-aniki.github.io/check2d/interfaces/BodyOptions.html)
 
 ### Step 3: Create and Manage Bodies
 
@@ -201,10 +201,10 @@ While physics engines like [Matter-js](https://github.com/liabru/matter-js) or [
 
 ## Benchmark
 
-This will provide you with the results of both the insertion test benchmark and a headless [Stress Demo](https://eikichi-onizuka-sensei.github.io/check2d/demo/?stress) benchmark, featuring moving bodies, with increasing amounts in each step.
+This will provide you with the results of both the insertion test benchmark and a headless [Stress Demo](https://onizuka-aniki.github.io/check2d/demo/?stress) benchmark, featuring moving bodies, with increasing amounts in each step.
 
 ```bash
-git clone https://github.com/eikichi-onizuka-sensei/check2d.git
+git clone https://github.com/onizuka-aniki/check2d.git
 cd check2d
 npm i && npm run build # will build & run tests & run benchmarks
 ```
