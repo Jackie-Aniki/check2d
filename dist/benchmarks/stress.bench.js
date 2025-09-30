@@ -32,7 +32,7 @@ const stressBenchmark = () => __awaiter(void 0, void 0, void 0, function* () {
                 stressTest.headless = true;
             },
             afterEach: () => {
-                stressTest.physics.clear();
+                stressTest.system.clear();
             }
         });
     });

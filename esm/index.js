@@ -2007,8 +2007,8 @@ var BodyGroup;
  * basic benchmark: https://jsbench.me/urle772xdn
  */
 const forEach = (array, callback) => {
-    for (let i = 0, l = array.length; i < l; i++) {
-        callback(array[i], i);
+    for (let index = 0, len = array.length; index < len; index++) {
+        callback(array[index], index);
     }
 };
 /**
@@ -2017,8 +2017,8 @@ const forEach = (array, callback) => {
  * basic benchmark: https://jsbench.me/l0le7bnnsq
  */
 const some = (array, callback) => {
-    for (let i = 0, l = array.length; i < l; i++) {
-        if (callback(array[i], i)) {
+    for (let index = 0, len = array.length; index < len; index++) {
+        if (callback(array[index], index)) {
             return true;
         }
     }
@@ -2030,8 +2030,8 @@ const some = (array, callback) => {
  * basic benchmark: https://jsbench.me/unle7da29v
  */
 const every = (array, callback) => {
-    for (let i = 0, l = array.length; i < l; i++) {
-        if (!callback(array[i], i)) {
+    for (let index = 0, len = array.length; index < len; index++) {
+        if (!callback(array[index], index)) {
             return false;
         }
     }
@@ -2044,9 +2044,9 @@ const every = (array, callback) => {
  */
 const filter = (array, callback) => {
     const output = [];
-    for (let i = 0, l = array.length; i < l; i++) {
-        const item = array[i];
-        if (callback(item, i)) {
+    for (let index = 0, len = array.length; index < len; index++) {
+        const item = array[index];
+        if (callback(item, index)) {
             output.push(item);
         }
     }
@@ -2058,10 +2058,10 @@ const filter = (array, callback) => {
  * basic benchmark: https://jsbench.me/oyle77vbpc
  */
 const map = (array, callback) => {
-    const l = array.length;
-    const output = new Array(l);
-    for (let i = 0; i < l; i++) {
-        output[i] = callback(array[i], i);
+    const len = array.length;
+    const output = new Array(len);
+    for (let index = 0; index < len; index++) {
+        output[index] = callback(array[index], index);
     }
     return output;
 };
@@ -2082,11 +2082,8 @@ function ensureConvex(body) {
  * @param circle
  */
 function polygonInCircle(polygon, circle) {
-    return every(polygon.calcPoints, (p) => {
-        const point = {
-            x: p.x + polygon.pos.x,
-            y: p.y + polygon.pos.y
-        };
+    const points = getWorldPoints(polygon);
+    return every(points, (point) => {
         return SATExports.pointInCircle(point, circle);
     });
 }
@@ -2094,7 +2091,8 @@ function pointInPolygon(point, polygon) {
     return some(ensureConvex(polygon), (convex) => SATExports.pointInPolygon(point, convex));
 }
 function polygonInPolygon(polygonA, polygonB) {
-    return every(polygonA.calcPoints, (point) => pointInPolygon({ x: point.x + polygonA.pos.x, y: point.y + polygonA.pos.y }, polygonB));
+    const points = getWorldPoints(polygonA);
+    return every(points, (point) => pointInPolygon(point, polygonB));
 }
 /**
  * https://stackoverflow.com/a/68197894/1749528
@@ -2141,10 +2139,7 @@ function circleInPolygon(circle, polygon) {
         return false;
     }
     // Necessary add polygon pos to points
-    const points = map(polygon.calcPoints, ({ x, y }) => ({
-        x: x + polygon.pos.x,
-        y: y + polygon.pos.y
-    }));
+    const points = getWorldPoints(polygon);
     // If the center of the circle is within the polygon,
     // the circle is not outside of the polygon completely.
     // so return false.
@@ -2182,14 +2177,12 @@ function circleOutsidePolygon(circle, polygon) {
         return false;
     }
     // Necessary add polygon pos to points
-    const points = map(polygon.calcPoints, ({ x, y }) => ({
-        x: x + polygon.pos.x,
-        y: y + polygon.pos.y
-    }));
+    const points = getWorldPoints(polygon);
     // If the center of the circle is within the polygon,
     // the circle is not outside of the polygon completely.
     // so return false.
-    if (some(points, (point) => SATExports.pointInCircle(point, circle) || pointOnCircle(point, circle))) {
+    if (some(points, (point) => SATExports.pointInCircle(point, circle) ||
+        pointOnCircle(point, circle))) {
         return false;
     }
     // If any line-segment of the polygon intersects the circle,
@@ -2266,7 +2259,7 @@ function intersectLineLine(line1, line2) {
     const dX = line1.end.x - line1.start.x;
     const dY = line1.end.y - line1.start.y;
     const determinant = dX * (line2.end.y - line2.start.y) - (line2.end.x - line2.start.x) * dY;
-    if (determinant === 0) {
+    if (Math.abs(determinant) < Number.EPSILON) {
         return;
     }
     const lambda = ((line2.end.y - line2.start.y) * (line2.end.x - line1.start.x) +
@@ -2275,21 +2268,55 @@ function intersectLineLine(line1, line2) {
     const gamma = ((line1.start.y - line1.end.y) * (line2.end.x - line1.start.x) +
         dX * (line2.end.y - line1.start.y)) /
         determinant;
-    // check if there is an intersection
-    if (!(lambda >= 0 && lambda <= 1) || !(gamma >= 0 && gamma <= 1)) {
+    // stricter check – no eps fudge, only inside [0,1]
+    if (lambda < 0 || lambda > 1 || gamma < 0 || gamma > 1) {
         return;
     }
     return { x: line1.start.x + lambda * dX, y: line1.start.y + lambda * dY };
 }
-function intersectLinePolygon(line, polygon) {
+/**
+ * Computes all intersection points between two polygons.
+ *
+ * Iterates over each edge of `polygonA` and checks against `polygonB`
+ * using {@link intersectLinePolygon}.
+ * Removes duplicates.
+ * Also detects corner–corner touches.
+ *
+ * @param {BasePolygon} polygonA - First polygon
+ * @param {BasePolygon} polygonB - Second polygon
+ * @returns {Vector[]} Array of intersection points (empty if none found)
+ */
+function intersectPolygonPolygon(polygonA, polygonB) {
+    const pointsA = getWorldPoints(polygonA);
+    const pointsB = getWorldPoints(polygonB);
     const results = [];
-    forEach(polygon.calcPoints, (to, index) => {
+    forEach(pointsA, (start, index) => {
+        const end = pointsA[(index + 1) % pointsA.length];
+        forEach(intersectLinePolygon({ start, end }, { pos: { x: 0, y: 0 }, calcPoints: pointsB }), ({ x, y }) => {
+            // add unique
+            if (!results.find((point) => x === point.x && y === point.y)) {
+                results.push({ x, y });
+            }
+        });
+    });
+    return results;
+}
+/**
+ * Computes all intersection points between a line segment and a polygon.
+ *
+ * @param {BaseLine} line - The line segment
+ * @param {BasePolygon} polygon - A polygon object or array of global points
+ * @returns {Vector[]} Array of intersection points (empty if none)
+ */
+function intersectLinePolygon(line, { calcPoints, pos }) {
+    const results = [];
+    forEach(calcPoints, (to, index) => {
         const from = index
-            ? polygon.calcPoints[index - 1]
-            : polygon.calcPoints[polygon.calcPoints.length - 1];
+            ? calcPoints[index - 1]
+            : calcPoints[calcPoints.length - 1];
         const side = {
-            start: { x: from.x + polygon.pos.x, y: from.y + polygon.pos.y },
-            end: { x: to.x + polygon.pos.x, y: to.y + polygon.pos.y }
+            start: { x: from.x + pos.x, y: from.y + pos.y },
+            end: { x: to.x + pos.x, y: to.y + pos.y }
         };
         const hit = intersectLineLine(line, side);
         if (hit) {
@@ -2361,6 +2388,7 @@ const polygonSATFunctions = createArray(BodyType.Polygon, 'sat');
 const polygonInFunctions = createArray(BodyType.Polygon, 'in');
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
+const EPSILON = 1e-9;
 /**
  * convert from degrees to radians
  */
@@ -2372,6 +2400,46 @@ function deg2rad(degrees) {
  */
 function rad2deg(radians) {
     return radians * RAD2DEG;
+}
+/**
+ * Compares two numbers for approximate equality within a given tolerance.
+ *
+ * Useful for floating-point calculations where exact equality (`===`)
+ * is unreliable due to rounding errors.
+ *
+ * @param {number} a - First number to compare
+ * @param {number} b - Second number to compare
+ * @param {number} [eps=EPSILON] - Allowed tolerance (default: global EPSILON)
+ * @returns {boolean} `true` if numbers differ by less than `eps`
+ */
+function almostEqual(a, b, eps = EPSILON) {
+    return Math.abs(a - b) < eps;
+}
+/**
+ * Compares two vectors for approximate equality within a tolerance.
+ *
+ * Uses {@link almostEqual} on both `x` and `y` coordinates.
+ * Two points are considered equal if both coordinates are
+ * within the allowed tolerance.
+ *
+ * @param {Vector} a - First vector
+ * @param {Vector} b - Second vector
+ * @returns {boolean} `true` if both vectors are approximately equal
+ */
+function pointsEqual(a, b) {
+    return almostEqual(a.x, b.x) && almostEqual(a.y, b.y);
+}
+/**
+ * Converts calcPoints into simple x/y Vectors and adds polygon pos to them
+ *
+ * @param {BasePolygon} polygon
+ * @returns {Vector[]}
+ */
+function getWorldPoints({ calcPoints, pos }) {
+    return map(calcPoints, ({ x, y }) => ({
+        x: x + pos.x,
+        y: y + pos.y
+    }));
 }
 /**
  * creates ellipse-shaped polygon based on params
@@ -3352,7 +3420,7 @@ class Box extends Polygon {
     }
     /**
      * after setting width/height update translate
-     * see https://github.com/Prozi/detect-collisions/issues/70
+     * see https://github.com/onizuka-aniki/check2d/issues/70
      */
     afterUpdateSize() {
         this.setPoints(createBox(this._width, this._height));
@@ -3620,7 +3688,7 @@ class System extends BaseSystem {
      */
     insert(body) {
         const insertResult = super.insert(body);
-        // set system for later body.system.updateBody(body)
+        // set system for later body.check2d.updateBody(body)
         body.system = this;
         return insertResult;
     }
@@ -3803,7 +3871,7 @@ class System extends BaseSystem {
         }
         // unique
         return collisionPoints.filter(({ x, y }, index) => index ===
-            collisionPoints.findIndex((collisionPoint) => collisionPoint.x === x && collisionPoint.y === y));
+            collisionPoints.findIndex((collisionPoint) => pointsEqual(collisionPoint, { x, y })));
     }
 }
 
@@ -3811,5 +3879,5 @@ var Response = SATExports.Response;
 var Circle$1 = SATExports.Circle;
 var Polygon$1 = SATExports.Polygon;
 var Vector = SATExports.Vector;
-export { BodyGroup, BodyType, Box, Circle, DEG2RAD, Ellipse, Line, Point, Polygon, RAD2DEG, RBush, Response, Circle$1 as SATCircle, Polygon$1 as SATPolygon, Vector as SATVector, System, bin2dec, bodyMoved, canInteract, checkAInB, circleInCircle, circleInPolygon, circleOutsidePolygon, clockwise, clonePointsArray, cloneResponse, createBox, createEllipse, dashLineTo, deg2rad, distance, drawBVH, drawPolygon, ensureConvex, ensureNumber, ensurePolygonPoints, ensureVectorPoint, extendBody, getBounceDirection, getGroup, getSATTest, groupBits, intersectAABB, intersectCircleCircle, intersectLineCircle, intersectLineLine, intersectLineLineFast, intersectLinePolygon, isSimple, mapArrayToVector, mapVectorToArray, move, notIntersectAABB, pointInPolygon, pointOnCircle, polygonInCircle, polygonInPolygon, quickDecomp, rad2deg, returnTrue };
+export { BodyGroup, BodyType, Box, Circle, DEG2RAD, EPSILON, Ellipse, Line, Point, Polygon, RAD2DEG, RBush, Response, Circle$1 as SATCircle, Polygon$1 as SATPolygon, Vector as SATVector, System, almostEqual, bin2dec, bodyMoved, canInteract, checkAInB, circleInCircle, circleInPolygon, circleOutsidePolygon, clockwise, clonePointsArray, cloneResponse, createBox, createEllipse, dashLineTo, deg2rad, distance, drawBVH, drawPolygon, ensureConvex, ensureNumber, ensurePolygonPoints, ensureVectorPoint, extendBody, getBounceDirection, getGroup, getSATTest, getWorldPoints, groupBits, intersectAABB, intersectCircleCircle, intersectLineCircle, intersectLineLine, intersectLineLineFast, intersectLinePolygon, intersectPolygonPolygon, isSimple, mapArrayToVector, mapVectorToArray, move, notIntersectAABB, pointInPolygon, pointOnCircle, pointsEqual, polygonInCircle, polygonInPolygon, quickDecomp, rad2deg, returnTrue };
 //# sourceMappingURL=index.js.map

@@ -4,5 +4,5 @@
   "plugin": [],
   "theme": "default",
   "tsconfig": "./tsconfig.json",
-  "name": "Detect-Collisions"
+  "name": "check2d"
 }

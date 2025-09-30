@@ -1,7 +1,8 @@
+import { BBox, BasePolygon, Body, BodyOptions, DecompPoint, PotentialVector, Response, SATPolygon, SATTest, SATVector, Vector } from './model';
 import { Polygon } from './bodies/polygon';
-import { BBox, Body, BodyOptions, DecompPoint, PotentialVector, Response, SATPolygon, SATTest, SATVector, Vector } from './model';
 export declare const DEG2RAD: number;
 export declare const RAD2DEG: number;
+export declare const EPSILON = 1e-9;
 /**
  * convert from degrees to radians
  */
@@ -10,6 +11,37 @@ export declare function deg2rad(degrees: number): number;
  * convert from radians to degrees
  */
 export declare function rad2deg(radians: number): number;
+/**
+ * Compares two numbers for approximate equality within a given tolerance.
+ *
+ * Useful for floating-point calculations where exact equality (`===`)
+ * is unreliable due to rounding errors.
+ *
+ * @param {number} a - First number to compare
+ * @param {number} b - Second number to compare
+ * @param {number} [eps=EPSILON] - Allowed tolerance (default: global EPSILON)
+ * @returns {boolean} `true` if numbers differ by less than `eps`
+ */
+export declare function almostEqual(a: number, b: number, eps?: number): boolean;
+/**
+ * Compares two vectors for approximate equality within a tolerance.
+ *
+ * Uses {@link almostEqual} on both `x` and `y` coordinates.
+ * Two points are considered equal if both coordinates are
+ * within the allowed tolerance.
+ *
+ * @param {Vector} a - First vector
+ * @param {Vector} b - Second vector
+ * @returns {boolean} `true` if both vectors are approximately equal
+ */
+export declare function pointsEqual(a: Vector, b: Vector): boolean;
+/**
+ * Converts calcPoints into simple x/y Vectors and adds polygon pos to them
+ *
+ * @param {BasePolygon} polygon
+ * @returns {Vector[]}
+ */
+export declare function getWorldPoints({ calcPoints, pos }: BasePolygon): Vector[];
 /**
  * creates ellipse-shaped polygon based on params
  */

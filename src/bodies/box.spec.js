@@ -2,14 +2,14 @@ describe('GIVEN Box', () => {
   it('THEN changing width works correctly', () => {
     const { System } = require('../../src')
 
-    const physics = new System()
-    const box = physics.createBox({}, 90, 100)
+    const check2d = new System()
+    const box = check2d.createBox({}, 90, 100)
 
-    physics.createBox({ x: 100 }, 90, 100)
+    check2d.createBox({ x: 100 }, 90, 100)
 
     let results = 0
 
-    physics.checkAll(() => {
+    check2d.checkAll(() => {
       results++
     })
 
@@ -17,8 +17,8 @@ describe('GIVEN Box', () => {
 
     box.width = 110
 
-    physics.insert(box)
-    physics.checkAll(() => {
+    check2d.insert(box)
+    check2d.checkAll(() => {
       results++
     })
 
@@ -28,14 +28,14 @@ describe('GIVEN Box', () => {
   it('THEN changing height works correctly', () => {
     const { System } = require('../../src')
 
-    const physics = new System()
-    const box = physics.createBox({}, 100, 90)
+    const check2d = new System()
+    const box = check2d.createBox({}, 100, 90)
 
-    physics.createBox({ y: 100 }, 100, 90)
+    check2d.createBox({ y: 100 }, 100, 90)
 
     let results = 0
 
-    physics.checkAll(() => {
+    check2d.checkAll(() => {
       results++
     })
 
@@ -43,8 +43,8 @@ describe('GIVEN Box', () => {
 
     box.height = 110
 
-    physics.insert(box)
-    physics.checkAll(() => {
+    check2d.insert(box)
+    check2d.checkAll(() => {
       results++
     })
 
@@ -54,30 +54,30 @@ describe('GIVEN Box', () => {
   it('THEN getPotentials works with Box with angle', () => {
     const { System, Circle, Box } = require('../../src')
 
-    const physics = new System()
+    const check2d = new System()
     const circle = new Circle({ x: 100, y: 100 }, 100)
-    physics.insert(circle)
+    check2d.insert(circle)
 
     const pos = { x: 400, y: 100 }
     const circle2 = new Circle(pos, 50)
-    physics.insert(circle2)
+    check2d.insert(circle2)
 
     const box = new Box({ x: 400, y: 300 }, 200, 100)
     box.setOffset({ x: 0, y: -50 })
     box.setAngle(5)
-    physics.insert(box)
+    check2d.insert(box)
 
     let case1works = false
     let case2works = false
 
-    if (physics.checkCollision(circle2, box)) {
+    if (check2d.checkCollision(circle2, box)) {
       case1works = true
     }
 
     expect(case1works).toBeTruthy()
 
-    physics.getPotentials(circle2).forEach((collider) => {
-      if (physics.checkCollision(circle2, collider)) {
+    check2d.getPotentials(circle2).forEach((collider) => {
+      if (check2d.checkCollision(circle2, collider)) {
         case2works = true
       }
     })
@@ -104,26 +104,26 @@ describe('GIVEN Box', () => {
     const { Box, System } = require('../../src')
 
     // initialize a collision detection system
-    const system = new System()
+    const check2d = new System()
 
     // bounds
     const box = new Box({ x: 0, y: 0 }, 1024, 768)
     const bbox = box.getAABBAsBBox()
 
     // out of bound
-    system.createCircle({ x: -20, y: -20 }, 10)
+    check2d.createCircle({ x: -20, y: -20 }, 10)
 
     // 3 bodies in bounds
-    system.createCircle({ x: 10, y: 10 }, 10)
-    system.createCircle({ x: 30, y: 30 }, 10)
-    system.createEllipse({ x: 10, y: 60 }, 20, 10)
+    check2d.createCircle({ x: 10, y: 10 }, 10)
+    check2d.createCircle({ x: 30, y: 30 }, 10)
+    check2d.createEllipse({ x: 10, y: 60 }, 20, 10)
 
     // bbox is even without inserting to system
-    const potentials = system.getPotentials(bbox)
+    const potentials = check2d.getPotentials(bbox)
 
     // the list of bodies colliding
     const collisions = potentials.filter((body) =>
-      system.checkCollision(box, body)
+      check2d.checkCollision(box, body)
     )
 
     expect(collisions.length).toBe(0)
@@ -136,8 +136,8 @@ describe('GIVEN Box', () => {
     box.width = 20
     box.height = 20
 
-    const physics = new System()
-    physics.insert(box)
+    const check2d = new System()
+    check2d.insert(box)
 
     expect(box.bbox.maxX - box.bbox.minX).toBe(box.width)
     expect(box.bbox.maxY - box.bbox.minY).toBe(box.height)
@@ -153,8 +153,8 @@ describe('GIVEN Box', () => {
     box.width = 20
     box.height = 20
 
-    const physics = new System()
-    physics.insert(box)
+    const check2d = new System()
+    check2d.insert(box)
 
     expect(box.bbox.maxX - box.bbox.minX).toBe(box.width)
     expect(box.bbox.maxY - box.bbox.minY).toBe(box.height)

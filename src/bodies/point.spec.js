@@ -11,8 +11,8 @@ describe('GIVEN Point', () => {
   describe('AND you set options', () => {
     it('THEN the parameters are set', () => {
       const { System } = require('../../src')
-      const physics = new System()
-      const body = physics.createPoint(
+      const check2d = new System()
+      const body = check2d.createPoint(
         { x: 0, y: 0 },
         {
           isStatic: true,

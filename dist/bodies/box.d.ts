@@ -49,7 +49,7 @@ export declare class Box<UserDataType = any> extends Polygon<UserDataType> {
     set height(height: number);
     /**
      * after setting width/height update translate
-     * see https://github.com/Prozi/detect-collisions/issues/70
+     * see https://github.com/onizuka-aniki/check2d/issues/70
      */
     protected afterUpdateSize(): void;
     /**

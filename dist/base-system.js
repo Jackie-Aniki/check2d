@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseSystem = void 0;
 const model_1 = require("./model");
-const optimized_1 = require("./optimized");
-const utils_1 = require("./utils");
 const box_1 = require("./bodies/box");
 const circle_1 = require("./bodies/circle");
 const ellipse_1 = require("./bodies/ellipse");
 const line_1 = require("./bodies/line");
 const point_1 = require("./bodies/point");
 const polygon_1 = require("./bodies/polygon");
+const utils_1 = require("./utils");
+const optimized_1 = require("./optimized");
 /**
  * very base collision system (create, insert, update, draw, remove)
  */

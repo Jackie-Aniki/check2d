@@ -2,7 +2,7 @@ export = Stress;
 declare class Stress {
     constructor(count?: number);
     size: number;
-    physics: System<import("../model").Body>;
+    check2d: System<import("../model").Body>;
     bodies: any[];
     polygons: number;
     boxes: number;

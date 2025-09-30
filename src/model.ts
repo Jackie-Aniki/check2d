@@ -25,6 +25,23 @@ export {
   quickDecomp
 } from 'poly-decomp-es'
 
+export type BasePoint = {
+  pos: Vector
+}
+
+export type BasePolygon = BasePoint & {
+  calcPoints: Vector[]
+}
+
+export type BaseCircle = BasePoint & {
+  r: number
+}
+
+export type BaseLine = {
+  start: Vector
+  end: Vector
+}
+
 export interface BBox {
   minX: number
   minY: number
@@ -86,12 +103,12 @@ export interface Data<TBody extends Body> {
  */
 export interface BodyOptions<UserDataType = any> {
   /**
-   * system.separate() doesn't move this body
+   * check2d.separate() doesn't move this body
    */
   isStatic?: boolean
 
   /**
-   * system.separate() doesn't trigger collision of this body
+   * check2d.separate() doesn't trigger collision of this body
    */
   isTrigger?: boolean
 
@@ -134,7 +151,7 @@ export interface BodyOptions<UserDataType = any> {
 }
 
 /**
- * system.raycast(from, to) result
+ * check2d.raycast(from, to) result
  */
 export interface RaycastHit<TBody> {
   point: Vector

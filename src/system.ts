@@ -1,12 +1,3 @@
-import { BaseSystem } from './base-system'
-import { Line } from './bodies/line'
-import {
-  ensureConvex,
-  intersectCircleCircle,
-  intersectLineCircle,
-  intersectLineLine,
-  intersectLinePolygon
-} from './intersect'
 import {
   BBox,
   Body,
@@ -17,15 +8,26 @@ import {
   SATVector,
   Vector
 } from './model'
-import { forEach, some } from './optimized'
 import {
   canInteract,
   checkAInB,
   distance,
   getSATTest,
   notIntersectAABB,
+  pointsEqual,
   returnTrue
 } from './utils'
+import {
+  ensureConvex,
+  intersectCircleCircle,
+  intersectLineCircle,
+  intersectLineLine,
+  intersectLinePolygon
+} from './intersect'
+import { forEach, some } from './optimized'
+
+import { BaseSystem } from './base-system'
+import { Line } from './bodies/line'
 
 /**
  * collision system
@@ -47,7 +49,7 @@ export class System<TBody extends Body = Body> extends BaseSystem<TBody> {
    */
   insert(body: TBody): this {
     const insertResult = super.insert(body)
-    // set system for later body.system.updateBody(body)
+    // set system for later body.check2d.updateBody(body)
     body.system = this
 
     return insertResult
@@ -302,8 +304,8 @@ export class System<TBody extends Body = Body> extends BaseSystem<TBody> {
     return collisionPoints.filter(
       ({ x, y }, index) =>
         index ===
-        collisionPoints.findIndex(
-          (collisionPoint) => collisionPoint.x === x && collisionPoint.y === y
+        collisionPoints.findIndex((collisionPoint) =>
+          pointsEqual(collisionPoint, { x, y })
         )
     )
   }

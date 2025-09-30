@@ -10,14 +10,14 @@ import {
   TraverseFunction,
   Vector
 } from './model'
-import { filter, forEach } from './optimized'
-import { bodyMoved, drawBVH } from './utils'
 import { Box, BoxConstructor } from './bodies/box'
 import { Circle, CircleConstructor } from './bodies/circle'
 import { Ellipse, EllipseConstructor } from './bodies/ellipse'
 import { Line, LineConstructor } from './bodies/line'
 import { Point, PointConstructor } from './bodies/point'
 import { Polygon, PolygonConstructor } from './bodies/polygon'
+import { bodyMoved, drawBVH } from './utils'
+import { filter, forEach } from './optimized'
 
 /**
  * very base collision system (create, insert, update, draw, remove)

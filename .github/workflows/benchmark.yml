@@ -1,37 +1,54 @@
-name: Detect Collisions
+name: check2d-benchmarks
 
 on:
+  # Manual run
+  workflow_dispatch:
+
+  # Automatic run on push
   push:
-    branches: [master, develop]
+    branches: [main]
     paths:
       - 'src/**'
       - '.github/workflows/benchmarks.yml'
+
+  # Automatic run on pull request
   pull_request:
-    branches: [master, develop]
+    branches: [main]
     paths:
       - 'src/**'
       - '.github/workflows/benchmarks.yml'
-  schedule:
-    - cron: '0 1 * * 1,3,5'
 
 jobs:
   bench:
-    name: 'Run Benchmarks'
+    name: 'Check2D Benchmarks'
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./
-
     steps:
+      # Checkout repo
       - uses: actions/checkout@v3
 
-      - name: Setting up Node.js
+      # Debug info to ensure workflow starts
+      - name: Debug Info
+        run: |
+          echo "Workflow started"
+          echo "Event name: ${{ github.event_name }}"
+          pwd
+          ls -la
+
+      # Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - run: |
-          npm install
-          npm run build
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Build the project
+      - name: Build
+        run: npm run build
+
+      # Run benchmarks
+      - name: Run Benchmarks
+        run: npm run benchmark

@@ -13,11 +13,13 @@ exports.circleOutsidePolygon = circleOutsidePolygon;
 exports.intersectLineCircle = intersectLineCircle;
 exports.intersectLineLineFast = intersectLineLineFast;
 exports.intersectLineLine = intersectLineLine;
+exports.intersectPolygonPolygon = intersectPolygonPolygon;
 exports.intersectLinePolygon = intersectLinePolygon;
 exports.intersectCircleCircle = intersectCircleCircle;
-const sat_1 = require("sat");
 const model_1 = require("./model");
 const optimized_1 = require("./optimized");
+const sat_1 = require("sat");
+const utils_1 = require("./utils");
 /**
  * replace body with array of related convex polygons
  */
@@ -32,11 +34,8 @@ function ensureConvex(body) {
  * @param circle
  */
 function polygonInCircle(polygon, circle) {
-    return (0, optimized_1.every)(polygon.calcPoints, (p) => {
-        const point = {
-            x: p.x + polygon.pos.x,
-            y: p.y + polygon.pos.y
-        };
+    const points = (0, utils_1.getWorldPoints)(polygon);
+    return (0, optimized_1.every)(points, (point) => {
         return (0, sat_1.pointInCircle)(point, circle);
     });
 }
@@ -44,7 +43,8 @@ function pointInPolygon(point, polygon) {
     return (0, optimized_1.some)(ensureConvex(polygon), (convex) => (0, sat_1.pointInPolygon)(point, convex));
 }
 function polygonInPolygon(polygonA, polygonB) {
-    return (0, optimized_1.every)(polygonA.calcPoints, (point) => pointInPolygon({ x: point.x + polygonA.pos.x, y: point.y + polygonA.pos.y }, polygonB));
+    const points = (0, utils_1.getWorldPoints)(polygonA);
+    return (0, optimized_1.every)(points, (point) => pointInPolygon(point, polygonB));
 }
 /**
  * https://stackoverflow.com/a/68197894/1749528
@@ -91,10 +91,7 @@ function circleInPolygon(circle, polygon) {
         return false;
     }
     // Necessary add polygon pos to points
-    const points = (0, optimized_1.map)(polygon.calcPoints, ({ x, y }) => ({
-        x: x + polygon.pos.x,
-        y: y + polygon.pos.y
-    }));
+    const points = (0, utils_1.getWorldPoints)(polygon);
     // If the center of the circle is within the polygon,
     // the circle is not outside of the polygon completely.
     // so return false.
@@ -132,14 +129,12 @@ function circleOutsidePolygon(circle, polygon) {
         return false;
     }
     // Necessary add polygon pos to points
-    const points = (0, optimized_1.map)(polygon.calcPoints, ({ x, y }) => ({
-        x: x + polygon.pos.x,
-        y: y + polygon.pos.y
-    }));
+    const points = (0, utils_1.getWorldPoints)(polygon);
     // If the center of the circle is within the polygon,
     // the circle is not outside of the polygon completely.
     // so return false.
-    if ((0, optimized_1.some)(points, (point) => (0, sat_1.pointInCircle)(point, circle) || pointOnCircle(point, circle))) {
+    if ((0, optimized_1.some)(points, (point) => (0, sat_1.pointInCircle)(point, circle) ||
+        pointOnCircle(point, circle))) {
         return false;
     }
     // If any line-segment of the polygon intersects the circle,
@@ -216,7 +211,7 @@ function intersectLineLine(line1, line2) {
     const dX = line1.end.x - line1.start.x;
     const dY = line1.end.y - line1.start.y;
     const determinant = dX * (line2.end.y - line2.start.y) - (line2.end.x - line2.start.x) * dY;
-    if (determinant === 0) {
+    if (Math.abs(determinant) < Number.EPSILON) {
         return;
     }
     const lambda = ((line2.end.y - line2.start.y) * (line2.end.x - line1.start.x) +
@@ -225,21 +220,55 @@ function intersectLineLine(line1, line2) {
     const gamma = ((line1.start.y - line1.end.y) * (line2.end.x - line1.start.x) +
         dX * (line2.end.y - line1.start.y)) /
         determinant;
-    // check if there is an intersection
-    if (!(lambda >= 0 && lambda <= 1) || !(gamma >= 0 && gamma <= 1)) {
+    // stricter check – no eps fudge, only inside [0,1]
+    if (lambda < 0 || lambda > 1 || gamma < 0 || gamma > 1) {
         return;
     }
     return { x: line1.start.x + lambda * dX, y: line1.start.y + lambda * dY };
 }
-function intersectLinePolygon(line, polygon) {
+/**
+ * Computes all intersection points between two polygons.
+ *
+ * Iterates over each edge of `polygonA` and checks against `polygonB`
+ * using {@link intersectLinePolygon}.
+ * Removes duplicates.
+ * Also detects corner–corner touches.
+ *
+ * @param {BasePolygon} polygonA - First polygon
+ * @param {BasePolygon} polygonB - Second polygon
+ * @returns {Vector[]} Array of intersection points (empty if none found)
+ */
+function intersectPolygonPolygon(polygonA, polygonB) {
+    const pointsA = (0, utils_1.getWorldPoints)(polygonA);
+    const pointsB = (0, utils_1.getWorldPoints)(polygonB);
     const results = [];
-    (0, optimized_1.forEach)(polygon.calcPoints, (to, index) => {
+    (0, optimized_1.forEach)(pointsA, (start, index) => {
+        const end = pointsA[(index + 1) % pointsA.length];
+        (0, optimized_1.forEach)(intersectLinePolygon({ start, end }, { pos: { x: 0, y: 0 }, calcPoints: pointsB }), ({ x, y }) => {
+            // add unique
+            if (!results.find((point) => x === point.x && y === point.y)) {
+                results.push({ x, y });
+            }
+        });
+    });
+    return results;
+}
+/**
+ * Computes all intersection points between a line segment and a polygon.
+ *
+ * @param {BaseLine} line - The line segment
+ * @param {BasePolygon} polygon - A polygon object or array of global points
+ * @returns {Vector[]} Array of intersection points (empty if none)
+ */
+function intersectLinePolygon(line, { calcPoints, pos }) {
+    const results = [];
+    (0, optimized_1.forEach)(calcPoints, (to, index) => {
         const from = index
-            ? polygon.calcPoints[index - 1]
-            : polygon.calcPoints[polygon.calcPoints.length - 1];
+            ? calcPoints[index - 1]
+            : calcPoints[calcPoints.length - 1];
         const side = {
-            start: { x: from.x + polygon.pos.x, y: from.y + polygon.pos.y },
-            end: { x: to.x + polygon.pos.x, y: to.y + polygon.pos.y }
+            start: { x: from.x + pos.x, y: from.y + pos.y },
+            end: { x: to.x + pos.x, y: to.y + pos.y }
         };
         const hit = intersectLineLine(line, side);
         if (hit) {

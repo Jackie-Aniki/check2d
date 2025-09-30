@@ -73,81 +73,81 @@ describe('GIVEN Polygon', () => {
   it("THEN setPosition() doesn't make bbox missed in checkCollision()", () => {
     const { System } = require('../../src')
 
-    const system = new System()
-    const poly = system.createPolygon({}, [
+    const check2d = new System()
+    const poly = check2d.createPolygon({}, [
       { x: 0, y: 0 },
       { x: 10, y: 0 },
       { x: 10, y: 10 },
       { x: 0, y: 10 }
     ])
 
-    system.createBox({}, 100, 100, { isStatic: true })
+    check2d.createBox({}, 100, 100, { isStatic: true })
 
-    expect(system.checkOne(poly)).toBe(true)
+    expect(check2d.checkOne(poly)).toBe(true)
     poly.setPosition(200, 200)
-    expect(system.checkOne(poly)).toBe(false)
+    expect(check2d.checkOne(poly)).toBe(false)
   })
 
   it("THEN setAngle() doesn't make bbox missed in checkCollision()", () => {
     const { System, deg2rad } = require('../../src')
 
-    const system = new System()
-    const poly = system.createPolygon({ x: -10, y: -10 }, [
+    const check2d = new System()
+    const poly = check2d.createPolygon({ x: -10, y: -10 }, [
       { x: 0, y: 0 },
       { x: 10, y: 0 },
       { x: 10, y: 10 },
       { x: 0, y: 10 }
     ])
 
-    system.createBox({}, 100, 100, { isStatic: true })
+    check2d.createBox({}, 100, 100, { isStatic: true })
 
-    expect(system.checkOne(poly)).toBe(true)
+    expect(check2d.checkOne(poly)).toBe(true)
     poly.setAngle(deg2rad(45))
-    expect(system.checkOne(poly)).toBe(false)
+    expect(check2d.checkOne(poly)).toBe(false)
   })
 
   it("THEN setOffset() doesn't make bbox missed in checkCollision()", () => {
     const { System } = require('../../src')
 
-    const system = new System()
-    const poly = system.createPolygon({}, [
+    const check2d = new System()
+    const poly = check2d.createPolygon({}, [
       { x: 0, y: 0 },
       { x: 10, y: 0 },
       { x: 10, y: 10 },
       { x: 0, y: 10 }
     ])
 
-    system.createBox({}, 100, 100, { isStatic: true })
+    check2d.createBox({}, 100, 100, { isStatic: true })
 
-    expect(system.checkOne(poly)).toBe(true)
+    expect(check2d.checkOne(poly)).toBe(true)
     poly.setOffset(-20, -20)
-    expect(system.checkOne(poly)).toBe(false)
+    expect(check2d.checkOne(poly)).toBe(false)
   })
 
   it("THEN setScale() doesn't make bbox missed in checkCollision()", () => {
     const { System } = require('../../src')
 
-    const system = new System()
-    const poly = system.createPolygon({ x: -5, y: -5 }, [
+    const check2d = new System()
+    const poly = check2d.createPolygon({ x: -5, y: -5 }, [
       { x: 0, y: 0 },
       { x: 10, y: 0 },
       { x: 10, y: 10 },
       { x: 0, y: 10 }
     ])
 
-    system.createBox({}, 100, 100, { isStatic: true })
+    check2d.createBox({}, 100, 100, { isStatic: true })
 
-    expect(system.checkOne(poly)).toBe(true)
+    expect(check2d.checkOne(poly)).toBe(true)
     poly.setScale(0.1)
-    expect(system.checkOne(poly)).toBe(false)
+    expect(check2d.checkOne(poly)).toBe(false)
   })
 
   describe('AND you set options', () => {
     it('THEN the parameters are set', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const body = physics.createPolygon({}, [{}], {
+      const check2d = new System()
+      const body = check2d.createPolygon({}, [{}], {
         isStatic: true,
         isTrigger: true
       })
@@ -184,8 +184,8 @@ describe('GIVEN Polygon', () => {
     it('THEN it collides properly', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const circle = physics.createCircle(
+      const check2d = new System()
+      const circle = check2d.createCircle(
         {
           x: -1311,
           y: 1642
@@ -193,7 +193,7 @@ describe('GIVEN Polygon', () => {
         3
       )
 
-      const polygon = physics.createPolygon(
+      const polygon = check2d.createPolygon(
         {
           x: -1418,
           y: 1675
@@ -201,7 +201,7 @@ describe('GIVEN Polygon', () => {
         polygonPoints
       )
 
-      expect(physics.checkCollision(circle, polygon)).toBe(true)
+      expect(check2d.checkCollision(circle, polygon)).toBe(true)
     })
   })
 
@@ -209,8 +209,8 @@ describe('GIVEN Polygon', () => {
     it('THEN it collides properly', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const circle = physics.createCircle(
+      const check2d = new System()
+      const circle = check2d.createCircle(
         {
           x: -1311,
           y: 1642
@@ -218,7 +218,7 @@ describe('GIVEN Polygon', () => {
         3
       )
 
-      const polygon = physics.createPolygon(
+      const polygon = check2d.createPolygon(
         {
           x: -1418,
           y: 1675
@@ -226,7 +226,7 @@ describe('GIVEN Polygon', () => {
         polygonPoints.reverse()
       )
 
-      expect(physics.checkCollision(circle, polygon)).toBe(true)
+      expect(check2d.checkCollision(circle, polygon)).toBe(true)
     })
   })
 
@@ -234,15 +234,15 @@ describe('GIVEN Polygon', () => {
     it('THEN it collides properly', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const concave = physics.createPolygon({ x: 0, y: 0 }, [
+      const check2d = new System()
+      const concave = check2d.createPolygon({ x: 0, y: 0 }, [
         { x: 190, y: 147 },
         { x: 256, y: 265 },
         { x: 400, y: 274 },
         { x: 360, y: 395 },
         { x: 80, y: 350 }
       ])
-      const convex = physics.createPolygon({ x: 0, y: 0 }, [
+      const convex = check2d.createPolygon({ x: 0, y: 0 }, [
         { x: 273, y: 251 },
         { x: 200, y: 120 },
         { x: 230, y: 40 },
@@ -251,7 +251,7 @@ describe('GIVEN Polygon', () => {
         { x: 440, y: 220 }
       ])
 
-      const collide = physics.checkCollision(concave, convex)
+      const collide = check2d.checkCollision(concave, convex)
 
       expect(collide).toBe(false)
     })
@@ -259,8 +259,8 @@ describe('GIVEN Polygon', () => {
     it('THEN it collides properly', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const concave = physics.createPolygon({ x: 0, y: 0 }, [
+      const check2d = new System()
+      const concave = check2d.createPolygon({ x: 0, y: 0 }, [
         { x: -11.25, y: -6.76 },
         { x: -12.5, y: -6.76 },
         { x: -12.5, y: 6.75 },
@@ -274,8 +274,8 @@ describe('GIVEN Polygon', () => {
         { x: -13.25, y: -7.51 },
         { x: -11.25, y: -7.51 }
       ])
-      const convex = physics.createCircle({ x: 0, y: 7 }, 1)
-      const collide = physics.checkCollision(concave, convex)
+      const convex = check2d.createCircle({ x: 0, y: 7 }, 1)
+      const collide = check2d.checkCollision(concave, convex)
 
       expect(collide).toBe(true)
     })
@@ -283,8 +283,8 @@ describe('GIVEN Polygon', () => {
     it('THEN it collides properly when rotated', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const concave = physics.createPolygon(
+      const check2d = new System()
+      const concave = check2d.createPolygon(
         { x: 0, y: 0 },
         [
           { x: -11.25, y: -6.76 },
@@ -304,21 +304,21 @@ describe('GIVEN Polygon', () => {
         })
       )
       concave.setAngle(Math.PI)
-      const convex = physics.createCircle({ x: 0, y: 7 }, 1)
-      const collide = physics.checkCollision(concave, convex)
+      const convex = check2d.createCircle({ x: 0, y: 7 }, 1)
+      const collide = check2d.checkCollision(concave, convex)
 
       expect(collide).toBe(true)
     })
   })
 
   describe('AND you scale it', () => {
-    // https://github.com/Prozi/detect-collisions/issues/91
+    // https://github.com/onizuka-aniki/check2d/issues/91
     it('THEN it collides properly', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const circle = physics.createCircle({ x: 50, y: 60 }, 4)
-      const polygon = physics.createPolygon({ x: 0, y: 0 }, [
+      const check2d = new System()
+      const circle = check2d.createCircle({ x: 50, y: 60 }, 4)
+      const polygon = check2d.createPolygon({ x: 0, y: 0 }, [
         { x: 25, y: 0 },
         { x: 33.8, y: 18.6 },
         { x: 44.3, y: 21 },
@@ -334,20 +334,20 @@ describe('GIVEN Polygon', () => {
 
       polygon.setScale(2)
 
-      expect(physics.checkCollision(circle, polygon)).toBe(true)
+      expect(check2d.checkCollision(circle, polygon)).toBe(true)
     })
 
     it('THEN it rescales properly', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const polygon = physics.createPolygon({ x: 0, y: 0 }, [
+      const check2d = new System()
+      const polygon = check2d.createPolygon({ x: 0, y: 0 }, [
         { x: -10, y: -10 },
         { x: -10, y: 10 },
         { x: 10, y: 10 },
         { x: 10, y: -10 }
       ])
-      const circle = physics.createCircle({ x: -5, y: 0 }, 1)
+      const circle = check2d.createCircle({ x: -5, y: 0 }, 1)
 
       for (let i = 0; i < 10; i++) {
         polygon.setScale(Math.random())
@@ -357,7 +357,7 @@ describe('GIVEN Polygon', () => {
       polygon.setScale(0.3)
 
       const { minX, minY, maxX, maxY } = polygon.getAABBAsBBox()
-      const collide = physics.checkCollision(polygon, circle)
+      const collide = check2d.checkCollision(polygon, circle)
 
       expect(minX).toBe(-3)
       expect(minY).toBe(-3)
@@ -369,8 +369,8 @@ describe('GIVEN Polygon', () => {
     it('THEN it rescales properly with rotation', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const polygon = physics.createPolygon({ x: 0, y: 0 }, [
+      const check2d = new System()
+      const polygon = check2d.createPolygon({ x: 0, y: 0 }, [
         { x: -10, y: -10 },
         { x: -10, y: 10 },
         { x: 10, y: 10 },
@@ -391,8 +391,8 @@ describe('GIVEN Polygon', () => {
     it('THEN it rescales properly with angle', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const polygon = physics.createPolygon({ x: 0, y: 0 }, [
+      const check2d = new System()
+      const polygon = check2d.createPolygon({ x: 0, y: 0 }, [
         { x: -10, y: -10 },
         { x: -10, y: 10 },
         { x: 10, y: 10 },
@@ -413,8 +413,8 @@ describe('GIVEN Polygon', () => {
     it('THEN you can get and set scale, scaleX, scaleY', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const polygon = physics.createPolygon({ x: 0, y: 0 }, [
+      const check2d = new System()
+      const polygon = check2d.createPolygon({ x: 0, y: 0 }, [
         { x: -10, y: -10 },
         { x: -10, y: 10 },
         { x: 10, y: 10 },
@@ -468,9 +468,9 @@ describe('GIVEN Polygon', () => {
 
       const dec = (binary) => Number(`0b${binary}`.replace(/\s/g, ''))
 
-      const physics = new System()
+      const check2d = new System()
 
-      const a = physics.createPolygon(
+      const a = check2d.createPolygon(
         { x: 0, y: 0 },
         [
           { x: 0, y: 0 },
@@ -482,7 +482,7 @@ describe('GIVEN Polygon', () => {
           group: (dec('0000 0000 0000 0001') << 16) | dec('0000 0000 0000 0001')
         }
       )
-      const b = physics.createPolygon(
+      const b = check2d.createPolygon(
         { x: 0, y: 0 },
         [
           { x: 0, y: 0 },
@@ -497,7 +497,7 @@ describe('GIVEN Polygon', () => {
 
       let collisions = 0
 
-      physics.checkAll(() => {
+      check2d.checkAll(() => {
         collisions++
       })
 
@@ -506,7 +506,7 @@ describe('GIVEN Polygon', () => {
       a.group = (dec('0000 0000 0000 0001') << 16) | dec('0000 0000 0000 0011')
       b.group = (dec('0000 0000 0000 0010') << 16) | dec('0000 0000 0000 0011')
 
-      physics.checkAll(() => {
+      check2d.checkAll(() => {
         collisions++
       })
 
@@ -517,8 +517,8 @@ describe('GIVEN Polygon', () => {
   it('THEN not setting userData works', () => {
     const { System } = require('../../src')
 
-    const physics = new System()
-    const polygon = physics.createPolygon({}, [{}])
+    const check2d = new System()
+    const polygon = check2d.createPolygon({}, [{}])
 
     expect(polygon.userData).toBe(undefined)
   })
@@ -526,8 +526,8 @@ describe('GIVEN Polygon', () => {
   it('THEN setting userData works', () => {
     const { System } = require('../../src')
 
-    const physics = new System()
-    const polygon = physics.createPolygon({}, [{}], {
+    const check2d = new System()
+    const polygon = check2d.createPolygon({}, [{}], {
       userData: { thank: 'you' }
     })
 
@@ -537,11 +537,11 @@ describe('GIVEN Polygon', () => {
   it('THEN setting userData to falsy values works', () => {
     const { System } = require('../../src')
 
-    const physics = new System()
-    const polygonFalse = physics.createPolygon({}, [{}], {
+    const check2d = new System()
+    const polygonFalse = check2d.createPolygon({}, [{}], {
       userData: false
     })
-    const polygonNull = physics.createPolygon({}, [{}], {
+    const polygonNull = check2d.createPolygon({}, [{}], {
       userData: null
     })
 

@@ -1012,7 +1012,8 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// Version 0.9
 		(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
 		__WEBPACK_AMD_DEFINE_FACTORY__),
 		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-  } else {}
+  } else // removed by dead control flow
+{}
 }(this, function () {
   "use strict";
 
@@ -2052,14 +2053,14 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// Version 0.9
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BaseSystem = void 0;
 const model_1 = __webpack_require__(/*! ./model */ "./src/model.ts");
-const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
-const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 const box_1 = __webpack_require__(/*! ./bodies/box */ "./src/bodies/box.ts");
 const circle_1 = __webpack_require__(/*! ./bodies/circle */ "./src/bodies/circle.ts");
 const ellipse_1 = __webpack_require__(/*! ./bodies/ellipse */ "./src/bodies/ellipse.ts");
 const line_1 = __webpack_require__(/*! ./bodies/line */ "./src/bodies/line.ts");
 const point_1 = __webpack_require__(/*! ./bodies/point */ "./src/bodies/point.ts");
 const polygon_1 = __webpack_require__(/*! ./bodies/polygon */ "./src/bodies/polygon.ts");
+const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
 /**
  * very base collision system (create, insert, update, draw, remove)
  */
@@ -2280,7 +2281,7 @@ class Box extends polygon_1.Polygon {
     }
     /**
      * after setting width/height update translate
-     * see https://github.com/Prozi/detect-collisions/issues/70
+     * see https://github.com/onizuka-aniki/check2d/issues/70
      */
     afterUpdateSize() {
         this.setPoints((0, utils_1.createBox)(this._width, this._height));
@@ -3152,14 +3153,14 @@ class TestCanvas {
       // Render the bodies
       this.context.strokeStyle = '#FFFFFF'
       this.context.beginPath()
-      this.test.physics.draw(this.context)
+      this.test.check2d.draw(this.context)
       this.context.stroke()
 
       // Render the BVH
       if (this.bvhCheckbox.checked) {
         this.context.strokeStyle = '#00FF00'
         this.context.beginPath()
-        this.test.physics.drawBVH(this.context)
+        this.test.check2d.drawBVH(this.context)
         this.context.stroke()
       }
 
@@ -3223,8 +3224,7 @@ function getDefaultCount() {
 class Stress {
   constructor(count = getDefaultCount()) {
     this.size = Math.sqrt((width * height) / (count * 50))
-
-    this.physics = new System(5)
+    this.check2d = new System(5)
     this.bodies = []
     this.polygons = 0
     this.boxes = 0
@@ -3284,16 +3284,16 @@ class Stress {
 
   getBounds() {
     return [
-      this.physics.createBox({ x: 0, y: 0 }, width, 10, {
+      this.check2d.createBox({ x: 0, y: 0 }, width, 10, {
         isStatic: true
       }),
-      this.physics.createBox({ x: width - 10, y: 0 }, 10, height, {
+      this.check2d.createBox({ x: width - 10, y: 0 }, 10, height, {
         isStatic: true
       }),
-      this.physics.createBox({ x: 0, y: height - 10 }, width, 10, {
+      this.check2d.createBox({ x: 0, y: height - 10 }, width, 10, {
         isStatic: true
       }),
-      this.physics.createBox({ x: 0, y: 0 }, 10, height, {
+      this.check2d.createBox({ x: 0, y: 0 }, 10, height, {
         isStatic: true
       })
     ]
@@ -3301,7 +3301,7 @@ class Stress {
 
   toggleFiltering() {
     this.enableFiltering = !this.enableFiltering
-    this.physics.clear()
+    this.check2d.clear()
     this.bodies.length = 0
     this.polygons = 0
     this.boxes = 0
@@ -3361,7 +3361,7 @@ class Stress {
       bounces.y += y
     }
 
-    this.physics.checkOne(body, addBounces)
+    this.check2d.checkOne(body, addBounces)
 
     if (bounces.x || bounces.y) {
       const size = 0.5 * (body.scaleX + body.scaleY)
@@ -3404,7 +3404,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Circle)
         }
-        body = this.physics.createCircle(
+        body = this.check2d.createCircle(
           { x, y },
           random(minSize, maxSize) / 2,
           options
@@ -3419,7 +3419,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Ellipse)
         }
-        body = this.physics.createEllipse({ x, y }, width, height, 2, options)
+        body = this.check2d.createEllipse({ x, y }, width, height, 2, options)
 
         ++this.ellipses
         break
@@ -3428,7 +3428,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Box)
         }
-        body = this.physics.createBox(
+        body = this.check2d.createBox(
           { x, y },
           random(minSize, maxSize),
           random(minSize, maxSize),
@@ -3442,7 +3442,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Line)
         }
-        body = this.physics.createLine(
+        body = this.check2d.createLine(
           { x, y },
           {
             x: x + random(minSize, maxSize),
@@ -3458,7 +3458,7 @@ class Stress {
         if (this.enableFiltering) {
           options.group = groupBits(BodyGroup.Polygon)
         }
-        body = this.physics.createPolygon(
+        body = this.check2d.createPolygon(
           { x, y },
           [
             { x: -random(minSize, maxSize), y: random(minSize, maxSize) },
@@ -3505,7 +3505,7 @@ const { doc, width, height, loop } = __webpack_require__(/*! ./canvas */ "./src/
 
 class Tank {
   constructor() {
-    this.physics = new System()
+    this.check2d = new System()
     this.bodies = []
     this.player = this.createPlayer(400, 300)
 
@@ -3630,7 +3630,7 @@ class Tank {
   }
 
   handleCollisions() {
-    this.physics.checkAll(({ a, b, overlapV }) => {
+    this.check2d.checkAll(({ a, b, overlapV }) => {
       if (a.isTrigger || b.isTrigger) {
         return
       }
@@ -3653,7 +3653,7 @@ class Tank {
     this.playerTurret.setAngle(this.player.angle, false)
     this.playerTurret.setPosition(this.player.x, this.player.y)
 
-    const hit = this.physics.raycast(
+    const hit = this.check2d.raycast(
       this.playerTurret.start,
       this.playerTurret.end,
       (test) => test !== this.player
@@ -3672,12 +3672,12 @@ class Tank {
   createPlayer(x, y, size = 13) {
     const player =
       Math.random() < 0.5
-        ? this.physics.createCircle(
+        ? this.check2d.createCircle(
             { x: this.scaleX(x), y: this.scaleY(y) },
             this.scaleX(size / 2),
             { isCentered: true }
           )
-        : this.physics.createBox(
+        : this.check2d.createBox(
             { x: this.scaleX(x - size / 2), y: this.scaleY(y - size / 2) },
             this.scaleX(size),
             this.scaleX(size),
@@ -3688,8 +3688,8 @@ class Tank {
     player.setOffset({ x: -this.scaleX(size / 2), y: 0 })
     player.setAngle(0.2)
 
-    this.physics.updateBody(player)
-    this.playerTurret = this.physics.createLine(
+    this.check2d.updateBody(player)
+    this.playerTurret = this.check2d.createLine(
       player,
       { x: player.x + this.scaleX(20) + this.scaleY(20), y: player.y },
       { angle: 0.2, isTrigger: true }
@@ -3707,14 +3707,14 @@ class Tank {
   }
 
   createCircle(x, y, radius) {
-    this.physics.createCircle(
+    this.check2d.createCircle(
       { x: this.scaleX(x), y: this.scaleY(y) },
       this.scaleX(radius)
     )
   }
 
   createEllipse(x, y, radiusX, radiusY, step, angle) {
-    this.physics.createEllipse(
+    this.check2d.createEllipse(
       { x: this.scaleX(x), y: this.scaleY(y) },
       this.scaleX(radiusX),
       this.scaleY(radiusY),
@@ -3729,7 +3729,7 @@ class Tank {
       y: this.scaleY(pointY)
     }))
 
-    return this.physics.createPolygon(
+    return this.check2d.createPolygon(
       { x: this.scaleX(x), y: this.scaleY(y) },
       scaledPoints,
       { angle, isStatic: true }
@@ -4511,11 +4511,13 @@ exports.circleOutsidePolygon = circleOutsidePolygon;
 exports.intersectLineCircle = intersectLineCircle;
 exports.intersectLineLineFast = intersectLineLineFast;
 exports.intersectLineLine = intersectLineLine;
+exports.intersectPolygonPolygon = intersectPolygonPolygon;
 exports.intersectLinePolygon = intersectLinePolygon;
 exports.intersectCircleCircle = intersectCircleCircle;
-const sat_1 = __webpack_require__(/*! sat */ "./node_modules/sat/SAT.js");
 const model_1 = __webpack_require__(/*! ./model */ "./src/model.ts");
 const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
+const sat_1 = __webpack_require__(/*! sat */ "./node_modules/sat/SAT.js");
+const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 /**
  * replace body with array of related convex polygons
  */
@@ -4530,11 +4532,8 @@ function ensureConvex(body) {
  * @param circle
  */
 function polygonInCircle(polygon, circle) {
-    return (0, optimized_1.every)(polygon.calcPoints, (p) => {
-        const point = {
-            x: p.x + polygon.pos.x,
-            y: p.y + polygon.pos.y
-        };
+    const points = (0, utils_1.getWorldPoints)(polygon);
+    return (0, optimized_1.every)(points, (point) => {
         return (0, sat_1.pointInCircle)(point, circle);
     });
 }
@@ -4542,7 +4541,8 @@ function pointInPolygon(point, polygon) {
     return (0, optimized_1.some)(ensureConvex(polygon), (convex) => (0, sat_1.pointInPolygon)(point, convex));
 }
 function polygonInPolygon(polygonA, polygonB) {
-    return (0, optimized_1.every)(polygonA.calcPoints, (point) => pointInPolygon({ x: point.x + polygonA.pos.x, y: point.y + polygonA.pos.y }, polygonB));
+    const points = (0, utils_1.getWorldPoints)(polygonA);
+    return (0, optimized_1.every)(points, (point) => pointInPolygon(point, polygonB));
 }
 /**
  * https://stackoverflow.com/a/68197894/1749528
@@ -4589,10 +4589,7 @@ function circleInPolygon(circle, polygon) {
         return false;
     }
     // Necessary add polygon pos to points
-    const points = (0, optimized_1.map)(polygon.calcPoints, ({ x, y }) => ({
-        x: x + polygon.pos.x,
-        y: y + polygon.pos.y
-    }));
+    const points = (0, utils_1.getWorldPoints)(polygon);
     // If the center of the circle is within the polygon,
     // the circle is not outside of the polygon completely.
     // so return false.
@@ -4630,14 +4627,12 @@ function circleOutsidePolygon(circle, polygon) {
         return false;
     }
     // Necessary add polygon pos to points
-    const points = (0, optimized_1.map)(polygon.calcPoints, ({ x, y }) => ({
-        x: x + polygon.pos.x,
-        y: y + polygon.pos.y
-    }));
+    const points = (0, utils_1.getWorldPoints)(polygon);
     // If the center of the circle is within the polygon,
     // the circle is not outside of the polygon completely.
     // so return false.
-    if ((0, optimized_1.some)(points, (point) => (0, sat_1.pointInCircle)(point, circle) || pointOnCircle(point, circle))) {
+    if ((0, optimized_1.some)(points, (point) => (0, sat_1.pointInCircle)(point, circle) ||
+        pointOnCircle(point, circle))) {
         return false;
     }
     // If any line-segment of the polygon intersects the circle,
@@ -4714,7 +4709,7 @@ function intersectLineLine(line1, line2) {
     const dX = line1.end.x - line1.start.x;
     const dY = line1.end.y - line1.start.y;
     const determinant = dX * (line2.end.y - line2.start.y) - (line2.end.x - line2.start.x) * dY;
-    if (determinant === 0) {
+    if (Math.abs(determinant) < Number.EPSILON) {
         return;
     }
     const lambda = ((line2.end.y - line2.start.y) * (line2.end.x - line1.start.x) +
@@ -4723,21 +4718,55 @@ function intersectLineLine(line1, line2) {
     const gamma = ((line1.start.y - line1.end.y) * (line2.end.x - line1.start.x) +
         dX * (line2.end.y - line1.start.y)) /
         determinant;
-    // check if there is an intersection
-    if (!(lambda >= 0 && lambda <= 1) || !(gamma >= 0 && gamma <= 1)) {
+    // stricter check – no eps fudge, only inside [0,1]
+    if (lambda < 0 || lambda > 1 || gamma < 0 || gamma > 1) {
         return;
     }
     return { x: line1.start.x + lambda * dX, y: line1.start.y + lambda * dY };
 }
-function intersectLinePolygon(line, polygon) {
+/**
+ * Computes all intersection points between two polygons.
+ *
+ * Iterates over each edge of `polygonA` and checks against `polygonB`
+ * using {@link intersectLinePolygon}.
+ * Removes duplicates.
+ * Also detects corner–corner touches.
+ *
+ * @param {BasePolygon} polygonA - First polygon
+ * @param {BasePolygon} polygonB - Second polygon
+ * @returns {Vector[]} Array of intersection points (empty if none found)
+ */
+function intersectPolygonPolygon(polygonA, polygonB) {
+    const pointsA = (0, utils_1.getWorldPoints)(polygonA);
+    const pointsB = (0, utils_1.getWorldPoints)(polygonB);
     const results = [];
-    (0, optimized_1.forEach)(polygon.calcPoints, (to, index) => {
+    (0, optimized_1.forEach)(pointsA, (start, index) => {
+        const end = pointsA[(index + 1) % pointsA.length];
+        (0, optimized_1.forEach)(intersectLinePolygon({ start, end }, { pos: { x: 0, y: 0 }, calcPoints: pointsB }), ({ x, y }) => {
+            // add unique
+            if (!results.find((point) => x === point.x && y === point.y)) {
+                results.push({ x, y });
+            }
+        });
+    });
+    return results;
+}
+/**
+ * Computes all intersection points between a line segment and a polygon.
+ *
+ * @param {BaseLine} line - The line segment
+ * @param {BasePolygon} polygon - A polygon object or array of global points
+ * @returns {Vector[]} Array of intersection points (empty if none)
+ */
+function intersectLinePolygon(line, { calcPoints, pos }) {
+    const results = [];
+    (0, optimized_1.forEach)(calcPoints, (to, index) => {
         const from = index
-            ? polygon.calcPoints[index - 1]
-            : polygon.calcPoints[polygon.calcPoints.length - 1];
+            ? calcPoints[index - 1]
+            : calcPoints[calcPoints.length - 1];
         const side = {
-            start: { x: from.x + polygon.pos.x, y: from.y + polygon.pos.y },
-            end: { x: to.x + polygon.pos.x, y: to.y + polygon.pos.y }
+            start: { x: from.x + pos.x, y: from.y + pos.y },
+            end: { x: to.x + pos.x, y: to.y + pos.y }
         };
         const hit = intersectLineLine(line, side);
         if (hit) {
@@ -4853,8 +4882,8 @@ exports.map = exports.filter = exports.every = exports.some = exports.forEach = 
  * basic benchmark: https://jsbench.me/urle772xdn
  */
 const forEach = (array, callback) => {
-    for (let i = 0, l = array.length; i < l; i++) {
-        callback(array[i], i);
+    for (let index = 0, len = array.length; index < len; index++) {
+        callback(array[index], index);
     }
 };
 exports.forEach = forEach;
@@ -4864,8 +4893,8 @@ exports.forEach = forEach;
  * basic benchmark: https://jsbench.me/l0le7bnnsq
  */
 const some = (array, callback) => {
-    for (let i = 0, l = array.length; i < l; i++) {
-        if (callback(array[i], i)) {
+    for (let index = 0, len = array.length; index < len; index++) {
+        if (callback(array[index], index)) {
             return true;
         }
     }
@@ -4878,8 +4907,8 @@ exports.some = some;
  * basic benchmark: https://jsbench.me/unle7da29v
  */
 const every = (array, callback) => {
-    for (let i = 0, l = array.length; i < l; i++) {
-        if (!callback(array[i], i)) {
+    for (let index = 0, len = array.length; index < len; index++) {
+        if (!callback(array[index], index)) {
             return false;
         }
     }
@@ -4893,9 +4922,9 @@ exports.every = every;
  */
 const filter = (array, callback) => {
     const output = [];
-    for (let i = 0, l = array.length; i < l; i++) {
-        const item = array[i];
-        if (callback(item, i)) {
+    for (let index = 0, len = array.length; index < len; index++) {
+        const item = array[index];
+        if (callback(item, index)) {
             output.push(item);
         }
     }
@@ -4908,10 +4937,10 @@ exports.filter = filter;
  * basic benchmark: https://jsbench.me/oyle77vbpc
  */
 const map = (array, callback) => {
-    const l = array.length;
-    const output = new Array(l);
-    for (let i = 0; i < l; i++) {
-        output[i] = callback(array[i], i);
+    const len = array.length;
+    const output = new Array(len);
+    for (let index = 0; index < len; index++) {
+        output[index] = callback(array[index], index);
     }
     return output;
 };
@@ -4930,12 +4959,12 @@ exports.map = map;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.System = void 0;
+const model_1 = __webpack_require__(/*! ./model */ "./src/model.ts");
+const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+const intersect_1 = __webpack_require__(/*! ./intersect */ "./src/intersect.ts");
+const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
 const base_system_1 = __webpack_require__(/*! ./base-system */ "./src/base-system.ts");
 const line_1 = __webpack_require__(/*! ./bodies/line */ "./src/bodies/line.ts");
-const intersect_1 = __webpack_require__(/*! ./intersect */ "./src/intersect.ts");
-const model_1 = __webpack_require__(/*! ./model */ "./src/model.ts");
-const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
-const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 /**
  * collision system
  */
@@ -4953,7 +4982,7 @@ class System extends base_system_1.BaseSystem {
      */
     insert(body) {
         const insertResult = super.insert(body);
-        // set system for later body.system.updateBody(body)
+        // set system for later body.check2d.updateBody(body)
         body.system = this;
         return insertResult;
     }
@@ -5136,7 +5165,7 @@ class System extends base_system_1.BaseSystem {
         }
         // unique
         return collisionPoints.filter(({ x, y }, index) => index ===
-            collisionPoints.findIndex((collisionPoint) => collisionPoint.x === x && collisionPoint.y === y));
+            collisionPoints.findIndex((collisionPoint) => (0, utils_1.pointsEqual)(collisionPoint, { x, y })));
     }
 }
 exports.System = System;
@@ -5154,9 +5183,12 @@ exports.System = System;
 
 /* tslint:disable:cyclomatic-complexity */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RAD2DEG = exports.DEG2RAD = void 0;
+exports.EPSILON = exports.RAD2DEG = exports.DEG2RAD = void 0;
 exports.deg2rad = deg2rad;
 exports.rad2deg = rad2deg;
+exports.almostEqual = almostEqual;
+exports.pointsEqual = pointsEqual;
+exports.getWorldPoints = getWorldPoints;
 exports.createEllipse = createEllipse;
 exports.createBox = createBox;
 exports.ensureVectorPoint = ensureVectorPoint;
@@ -5184,10 +5216,10 @@ exports.bin2dec = bin2dec;
 exports.ensureNumber = ensureNumber;
 exports.groupBits = groupBits;
 exports.move = move;
-const sat_1 = __webpack_require__(/*! sat */ "./node_modules/sat/SAT.js");
-const intersect_1 = __webpack_require__(/*! ./intersect */ "./src/intersect.ts");
 const model_1 = __webpack_require__(/*! ./model */ "./src/model.ts");
+const intersect_1 = __webpack_require__(/*! ./intersect */ "./src/intersect.ts");
 const optimized_1 = __webpack_require__(/*! ./optimized */ "./src/optimized.ts");
+const sat_1 = __webpack_require__(/*! sat */ "./node_modules/sat/SAT.js");
 /* helpers for faster getSATTest() and checkAInB() */
 const testMap = {
     satCircleCircle: sat_1.testCircleCircle,
@@ -5215,6 +5247,7 @@ const polygonSATFunctions = createArray(model_1.BodyType.Polygon, 'sat');
 const polygonInFunctions = createArray(model_1.BodyType.Polygon, 'in');
 exports.DEG2RAD = Math.PI / 180;
 exports.RAD2DEG = 180 / Math.PI;
+exports.EPSILON = 1e-9;
 /**
  * convert from degrees to radians
  */
@@ -5226,6 +5259,46 @@ function deg2rad(degrees) {
  */
 function rad2deg(radians) {
     return radians * exports.RAD2DEG;
+}
+/**
+ * Compares two numbers for approximate equality within a given tolerance.
+ *
+ * Useful for floating-point calculations where exact equality (`===`)
+ * is unreliable due to rounding errors.
+ *
+ * @param {number} a - First number to compare
+ * @param {number} b - Second number to compare
+ * @param {number} [eps=EPSILON] - Allowed tolerance (default: global EPSILON)
+ * @returns {boolean} `true` if numbers differ by less than `eps`
+ */
+function almostEqual(a, b, eps = exports.EPSILON) {
+    return Math.abs(a - b) < eps;
+}
+/**
+ * Compares two vectors for approximate equality within a tolerance.
+ *
+ * Uses {@link almostEqual} on both `x` and `y` coordinates.
+ * Two points are considered equal if both coordinates are
+ * within the allowed tolerance.
+ *
+ * @param {Vector} a - First vector
+ * @param {Vector} b - Second vector
+ * @returns {boolean} `true` if both vectors are approximately equal
+ */
+function pointsEqual(a, b) {
+    return almostEqual(a.x, b.x) && almostEqual(a.y, b.y);
+}
+/**
+ * Converts calcPoints into simple x/y Vectors and adds polygon pos to them
+ *
+ * @param {BasePolygon} polygon
+ * @returns {Vector[]}
+ */
+function getWorldPoints({ calcPoints, pos }) {
+    return (0, optimized_1.map)(calcPoints, ({ x, y }) => ({
+        x: x + pos.x,
+        y: y + pos.y
+    }));
 }
 /**
  * creates ellipse-shaped polygon based on params

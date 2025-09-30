@@ -9,8 +9,8 @@ export const forEach = <T>(
   array: T[],
   callback: (item: T, index: number) => void
 ): void => {
-  for (let i = 0, l = array.length; i < l; i++) {
-    callback(array[i], i)
+  for (let index = 0, len = array.length; index < len; index++) {
+    callback(array[index], index)
   }
 }
 
@@ -23,8 +23,8 @@ export const some = <T>(
   array: T[],
   callback: (item: T, index: number) => unknown
 ): boolean => {
-  for (let i = 0, l = array.length; i < l; i++) {
-    if (callback(array[i], i)) {
+  for (let index = 0, len = array.length; index < len; index++) {
+    if (callback(array[index], index)) {
       return true
     }
   }
@@ -41,8 +41,8 @@ export const every = <T>(
   array: T[],
   callback: (item: T, index: number) => unknown
 ): boolean => {
-  for (let i = 0, l = array.length; i < l; i++) {
-    if (!callback(array[i], i)) {
+  for (let index = 0, len = array.length; index < len; index++) {
+    if (!callback(array[index], index)) {
       return false
     }
   }
@@ -61,10 +61,10 @@ export const filter = <T>(
 ): T[] => {
   const output: T[] = []
 
-  for (let i = 0, l = array.length; i < l; i++) {
-    const item = array[i]
+  for (let index = 0, len = array.length; index < len; index++) {
+    const item = array[index]
 
-    if (callback(item, i)) {
+    if (callback(item, index)) {
       output.push(item)
     }
   }
@@ -81,11 +81,11 @@ export const map = <T, Y>(
   array: T[],
   callback: (item: T, index: number) => Y
 ): Y[] => {
-  const l = array.length
-  const output = new Array<Y>(l)
+  const len = array.length
+  const output = new Array<Y>(len)
 
-  for (let i = 0; i < l; i++) {
-    output[i] = callback(array[i], i)
+  for (let index = 0; index < len; index++) {
+    output[index] = callback(array[index], index)
   }
 
   return output

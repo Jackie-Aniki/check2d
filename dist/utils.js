@@ -1,9 +1,12 @@
 "use strict";
 /* tslint:disable:cyclomatic-complexity */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RAD2DEG = exports.DEG2RAD = void 0;
+exports.EPSILON = exports.RAD2DEG = exports.DEG2RAD = void 0;
 exports.deg2rad = deg2rad;
 exports.rad2deg = rad2deg;
+exports.almostEqual = almostEqual;
+exports.pointsEqual = pointsEqual;
+exports.getWorldPoints = getWorldPoints;
 exports.createEllipse = createEllipse;
 exports.createBox = createBox;
 exports.ensureVectorPoint = ensureVectorPoint;
@@ -31,10 +34,10 @@ exports.bin2dec = bin2dec;
 exports.ensureNumber = ensureNumber;
 exports.groupBits = groupBits;
 exports.move = move;
-const sat_1 = require("sat");
-const intersect_1 = require("./intersect");
 const model_1 = require("./model");
+const intersect_1 = require("./intersect");
 const optimized_1 = require("./optimized");
+const sat_1 = require("sat");
 /* helpers for faster getSATTest() and checkAInB() */
 const testMap = {
     satCircleCircle: sat_1.testCircleCircle,
@@ -62,6 +65,7 @@ const polygonSATFunctions = createArray(model_1.BodyType.Polygon, 'sat');
 const polygonInFunctions = createArray(model_1.BodyType.Polygon, 'in');
 exports.DEG2RAD = Math.PI / 180;
 exports.RAD2DEG = 180 / Math.PI;
+exports.EPSILON = 1e-9;
 /**
  * convert from degrees to radians
  */
@@ -73,6 +77,46 @@ function deg2rad(degrees) {
  */
 function rad2deg(radians) {
     return radians * exports.RAD2DEG;
+}
+/**
+ * Compares two numbers for approximate equality within a given tolerance.
+ *
+ * Useful for floating-point calculations where exact equality (`===`)
+ * is unreliable due to rounding errors.
+ *
+ * @param {number} a - First number to compare
+ * @param {number} b - Second number to compare
+ * @param {number} [eps=EPSILON] - Allowed tolerance (default: global EPSILON)
+ * @returns {boolean} `true` if numbers differ by less than `eps`
+ */
+function almostEqual(a, b, eps = exports.EPSILON) {
+    return Math.abs(a - b) < eps;
+}
+/**
+ * Compares two vectors for approximate equality within a tolerance.
+ *
+ * Uses {@link almostEqual} on both `x` and `y` coordinates.
+ * Two points are considered equal if both coordinates are
+ * within the allowed tolerance.
+ *
+ * @param {Vector} a - First vector
+ * @param {Vector} b - Second vector
+ * @returns {boolean} `true` if both vectors are approximately equal
+ */
+function pointsEqual(a, b) {
+    return almostEqual(a.x, b.x) && almostEqual(a.y, b.y);
+}
+/**
+ * Converts calcPoints into simple x/y Vectors and adds polygon pos to them
+ *
+ * @param {BasePolygon} polygon
+ * @returns {Vector[]}
+ */
+function getWorldPoints({ calcPoints, pos }) {
+    return (0, optimized_1.map)(calcPoints, ({ x, y }) => ({
+        x: x + pos.x,
+        y: y + pos.y
+    }));
 }
 /**
  * creates ellipse-shaped polygon based on params

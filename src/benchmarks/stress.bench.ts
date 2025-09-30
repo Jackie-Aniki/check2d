@@ -27,7 +27,7 @@ export const stressBenchmark = async () => {
           stressTest.headless = true
         },
         afterEach: () => {
-          stressTest.physics.clear()
+          stressTest.system.clear()
         }
       }
     )

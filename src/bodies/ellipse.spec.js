@@ -3,14 +3,14 @@ describe('GIVEN Ellipse', () => {
     it('THEN it gives correct collision results', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const ellipse = physics.createEllipse({ x: 0, y: 0 }, 10, 30)
+      const check2d = new System()
+      const ellipse = check2d.createEllipse({ x: 0, y: 0 }, 10, 30)
 
-      physics.createEllipse({ x: 25, y: 0 }, 10, 30)
+      check2d.createEllipse({ x: 25, y: 0 }, 10, 30)
 
       let collisions = 0
 
-      physics.checkAll(() => {
+      check2d.checkAll(() => {
         collisions++
       })
 
@@ -18,14 +18,14 @@ describe('GIVEN Ellipse', () => {
 
       ellipse.radiusX = 20
 
-      physics.checkAll(() => {
+      check2d.checkAll(() => {
         collisions++
       })
 
       expect(collisions).toBe(0)
 
-      physics.insert(ellipse)
-      physics.checkAll(() => {
+      check2d.insert(ellipse)
+      check2d.checkAll(() => {
         collisions++
       })
 
@@ -37,14 +37,14 @@ describe('GIVEN Ellipse', () => {
     it('THEN it gives correct collision results', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const ellipse = physics.createEllipse({ x: 0, y: 0 }, 30, 10)
+      const check2d = new System()
+      const ellipse = check2d.createEllipse({ x: 0, y: 0 }, 30, 10)
 
-      physics.createEllipse({ x: 0, y: 25 }, 30, 10)
+      check2d.createEllipse({ x: 0, y: 25 }, 30, 10)
 
       let collisions = 0
 
-      physics.checkAll(() => {
+      check2d.checkAll(() => {
         collisions++
       })
 
@@ -52,14 +52,14 @@ describe('GIVEN Ellipse', () => {
 
       ellipse.radiusY = 20
 
-      physics.checkAll(() => {
+      check2d.checkAll(() => {
         collisions++
       })
 
       expect(collisions).toBe(0)
 
-      physics.insert(ellipse)
-      physics.checkAll(() => {
+      check2d.insert(ellipse)
+      check2d.checkAll(() => {
         collisions++
       })
 
@@ -71,19 +71,19 @@ describe('GIVEN Ellipse', () => {
     it('THEN they give correct collision results', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const ellipse1 = physics.createEllipse({ x: 0, y: 0 }, 10, 30)
-      const ellipse2 = physics.createEllipse({ x: 0, y: 0 }, 10, 30)
+      const check2d = new System()
+      const ellipse1 = check2d.createEllipse({ x: 0, y: 0 }, 10, 30)
+      const ellipse2 = check2d.createEllipse({ x: 0, y: 0 }, 10, 30)
 
-      expect(physics.checkCollision(ellipse1, ellipse2)).toBeTruthy()
+      expect(check2d.checkCollision(ellipse1, ellipse2)).toBeTruthy()
     })
   })
 
   describe('AND you set options', () => {
     it('THEN the parameters are set', () => {
       const { System } = require('../../src')
-      const physics = new System()
-      const body = physics.createEllipse({}, 10, 10, 1, {
+      const check2d = new System()
+      const body = check2d.createEllipse({}, 10, 10, 1, {
         isStatic: true,
         isTrigger: true
       })

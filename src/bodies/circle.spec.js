@@ -5,14 +5,14 @@ describe('GIVEN Circle', () => {
     it('THEN it gives correct collision results', () => {
       const { System } = require('../../src')
 
-      const physics = new System()
-      const circle = physics.createCircle({ x: 0, y: 0 }, 10)
+      const check2d = new System()
+      const circle = check2d.createCircle({ x: 0, y: 0 }, 10)
 
-      physics.createCircle({ x: 25, y: 0 }, 10)
+      check2d.createCircle({ x: 25, y: 0 }, 10)
 
       let collisions = 0
 
-      physics.checkAll(() => {
+      check2d.checkAll(() => {
         collisions++
       })
 
@@ -20,14 +20,14 @@ describe('GIVEN Circle', () => {
 
       circle.r = 20
 
-      physics.checkAll(() => {
+      check2d.checkAll(() => {
         collisions++
       })
 
       expect(collisions).toBe(0)
 
-      physics.insert(circle)
-      physics.checkAll(() => {
+      check2d.insert(circle)
+      check2d.checkAll(() => {
         collisions++
       })
 
@@ -38,12 +38,12 @@ describe('GIVEN Circle', () => {
   describe('AND two circles perfectly overlap', () => {
     it('THEN they give correct collision results', () => {
       const { System } = require('../../src')
-      const physics = new System()
+      const check2d = new System()
 
-      physics.createCircle({ x: 0, y: 0 }, 10)
-      physics.createCircle({ x: 0, y: 0 }, 10)
+      check2d.createCircle({ x: 0, y: 0 }, 10)
+      check2d.createCircle({ x: 0, y: 0 }, 10)
 
-      physics.checkAll((result) => {
+      check2d.checkAll((result) => {
         expect(result.aInB).toBeTruthy()
         expect(result.bInA).toBeTruthy()
       })
@@ -53,8 +53,8 @@ describe('GIVEN Circle', () => {
   describe('AND you set options', () => {
     it('THEN the parameters are set', () => {
       const { System } = require('../../src')
-      const physics = new System()
-      const body = physics.createCircle({}, 10, {
+      const check2d = new System()
+      const body = check2d.createCircle({}, 10, {
         isStatic: true,
         isTrigger: true
       })
@@ -67,8 +67,8 @@ describe('GIVEN Circle', () => {
   describe('AND you scale it', () => {
     it('THEN you can get and set scale, scaleX, scaleY', () => {
       const { System } = require('../../src')
-      const physics = new System()
-      const body = physics.createCircle({ x: 0, y: 0 }, 9)
+      const check2d = new System()
+      const body = check2d.createCircle({ x: 0, y: 0 }, 9)
 
       body.scale = 4
       expect(body.scale).toBe(4)
@@ -89,18 +89,18 @@ describe('GIVEN Circle', () => {
 
       const dec = (binary) => Number(`0b${binary}`.replace(/\s/g, ''))
 
-      const physics = new System()
+      const check2d = new System()
 
-      const a = physics.createCircle({ x: 0, y: 0 }, 10, {
+      const a = check2d.createCircle({ x: 0, y: 0 }, 10, {
         group: (dec('0000 0000 0000 0001') << 16) | dec('0000 0000 0000 0001')
       })
-      const b = physics.createCircle({ x: 0, y: 0 }, 10, {
+      const b = check2d.createCircle({ x: 0, y: 0 }, 10, {
         group: (dec('0000 0000 0000 0010') << 16) | dec('0000 0000 0000 0010')
       })
 
       let collisions = 0
 
-      physics.checkAll(() => {
+      check2d.checkAll(() => {
         collisions++
       })
 
@@ -109,7 +109,7 @@ describe('GIVEN Circle', () => {
       a.group = (dec('0000 0000 0000 0001') << 16) | dec('0000 0000 0000 0011')
       b.group = (dec('0000 0000 0000 0010') << 16) | dec('0000 0000 0000 0011')
 
-      physics.checkAll(() => {
+      check2d.checkAll(() => {
         collisions++
       })
 
@@ -120,8 +120,8 @@ describe('GIVEN Circle', () => {
   it('THEN not setting userData works', () => {
     const { System } = require('../../src')
 
-    const physics = new System()
-    const circle = physics.createCircle({ x: 0, y: 0 }, 10)
+    const check2d = new System()
+    const circle = check2d.createCircle({ x: 0, y: 0 }, 10)
 
     expect(circle.userData).toBe(undefined)
   })
@@ -129,8 +129,8 @@ describe('GIVEN Circle', () => {
   it('THEN setting userData works', () => {
     const { System } = require('../../src')
 
-    const physics = new System()
-    const circle = physics.createCircle({ x: 0, y: 0 }, 10, {
+    const check2d = new System()
+    const circle = check2d.createCircle({ x: 0, y: 0 }, 10, {
       userData: { thank: 'you' }
     })
 
@@ -140,11 +140,11 @@ describe('GIVEN Circle', () => {
   it('THEN setting userData to falsy values works', () => {
     const { System } = require('../../src')
 
-    const physics = new System()
-    const circleFalse = physics.createCircle({ x: 0, y: 0 }, 10, {
+    const check2d = new System()
+    const circleFalse = check2d.createCircle({ x: 0, y: 0 }, 10, {
       userData: false
     })
-    const circleNull = physics.createCircle({ x: 0, y: 0 }, 10, {
+    const circleNull = check2d.createCircle({ x: 0, y: 0 }, 10, {
       userData: null
     })
 
