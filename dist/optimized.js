@@ -8,9 +8,9 @@ exports.map = exports.filter = exports.every = exports.some = exports.forEach = 
  * basic benchmark: https://jsbench.me/urle772xdn
  */
 const forEach = (array, callback) => {
-    for (let index = 0, len = array.length; index < len; index++) {
-        callback(array[index], index);
-    }
+  for (let index = 0, len = array.length; index < len; index++) {
+    callback(array[index], index);
+  }
 };
 exports.forEach = forEach;
 /**
@@ -19,12 +19,12 @@ exports.forEach = forEach;
  * basic benchmark: https://jsbench.me/l0le7bnnsq
  */
 const some = (array, callback) => {
-    for (let index = 0, len = array.length; index < len; index++) {
-        if (callback(array[index], index)) {
-            return true;
-        }
+  for (let index = 0, len = array.length; index < len; index++) {
+    if (callback(array[index], index)) {
+      return true;
     }
-    return false;
+  }
+  return false;
 };
 exports.some = some;
 /**
@@ -33,12 +33,12 @@ exports.some = some;
  * basic benchmark: https://jsbench.me/unle7da29v
  */
 const every = (array, callback) => {
-    for (let index = 0, len = array.length; index < len; index++) {
-        if (!callback(array[index], index)) {
-            return false;
-        }
+  for (let index = 0, len = array.length; index < len; index++) {
+    if (!callback(array[index], index)) {
+      return false;
     }
-    return true;
+  }
+  return true;
 };
 exports.every = every;
 /**
@@ -47,14 +47,14 @@ exports.every = every;
  * basic benchmark: https://jsbench.me/o1le77ev4l
  */
 const filter = (array, callback) => {
-    const output = [];
-    for (let index = 0, len = array.length; index < len; index++) {
-        const item = array[index];
-        if (callback(item, index)) {
-            output.push(item);
-        }
+  const output = [];
+  for (let index = 0, len = array.length; index < len; index++) {
+    const item = array[index];
+    if (callback(item, index)) {
+      output.push(item);
     }
-    return output;
+  }
+  return output;
 };
 exports.filter = filter;
 /**
@@ -63,11 +63,11 @@ exports.filter = filter;
  * basic benchmark: https://jsbench.me/oyle77vbpc
  */
 const map = (array, callback) => {
-    const len = array.length;
-    const output = new Array(len);
-    for (let index = 0; index < len; index++) {
-        output[index] = callback(array[index], index);
-    }
-    return output;
+  const len = array.length;
+  const output = new Array(len);
+  for (let index = 0; index < len; index++) {
+    output[index] = callback(array[index], index);
+  }
+  return output;
 };
 exports.map = map;
