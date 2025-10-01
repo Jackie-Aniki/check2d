@@ -1,7 +1,7 @@
 # check2d
 
 [<img src="https://img.shields.io/npm/v/check2d?style=for-the-badge&color=success" alt="npm version" />](https://www.npmjs.com/package/check2d?activeTab=versions)
-[<img src="https://img.shields.io/circleci/build/github/jackie-aniki/check2d/main?style=for-the-badge" alt="build status" />](https://app.circleci.com/pipelines/github/jackie-aniki/check2d)
+[<img src="https://img.shields.io/circleci/build/github/Jackie-Aniki/check2d/main?style=for-the-badge" alt="build status" />](https://app.circleci.com/pipelines/github/Jackie-Aniki/check2d)
 [<img src="https://img.shields.io/npm/dw/check2d.svg?style=for-the-badge&color=success" alt="npm downloads per week" />](https://www.npmjs.com/package/check2d)
 
 ## Introduction

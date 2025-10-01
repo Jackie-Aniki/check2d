@@ -8,19 +8,19 @@ const box_1 = require("./box");
  * collider - point (very tiny box)
  */
 class Point extends box_1.Box {
-  /**
-   * collider - point (very tiny box)
-   */
-  constructor(position, options) {
-    super((0, utils_1.ensureVectorPoint)(position), 0.001, 0.001, options);
     /**
-     * point type
+     * collider - point (very tiny box)
      */
-    this.type = model_1.BodyType.Point;
-    /**
-     * faster than type
-     */
-    this.typeGroup = model_1.BodyGroup.Point;
-  }
+    constructor(position, options) {
+        super((0, utils_1.ensureVectorPoint)(position), 0.001, 0.001, options);
+        /**
+         * point type
+         */
+        this.type = model_1.BodyType.Point;
+        /**
+         * faster than type
+         */
+        this.typeGroup = model_1.BodyGroup.Point;
+    }
 }
 exports.Point = Point;
