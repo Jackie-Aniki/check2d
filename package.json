@@ -111,7 +111,7 @@
     "ts-loader": "^9.5.4",
     "typedoc": "^0.28.15",
     "typescript": "^5",
-    "webpack": "^5.104.0",
+    "webpack": "^5.104.1",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.2"
   },
