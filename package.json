@@ -105,7 +105,7 @@
     "random-seed": "^0.3.0",
     "rbush": "^4.0.1",
     "rimraf": "^6.1.2",
-    "rollup": "^4.53.5",
+    "rollup": "^4.59.0",
     "tinybench": "^5",
     "ts-jest": "^29.4.6",
     "ts-loader": "^9.5.4",
